@@ -22,6 +22,14 @@ public class Message {
 		this.port = port;
 	}
 
+	public Message(Integer source, Integer destination, MessageType msgType, Integer port) {
+		super();
+		this.source = source;
+		this.destination = destination;
+		this.msgType = msgType;
+		this.port = port;
+	}
+
 	public Integer getSource() {
 		return source;
 	}

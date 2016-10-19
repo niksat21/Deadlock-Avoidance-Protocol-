@@ -54,7 +54,6 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		}
 		isInsideCS = true;
 		logger.debug("Critical Section request granted for NodeId:{}", sourceNode.getNodeId());
-		return;
 	}
 
 	@Override
@@ -66,6 +65,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 					sourceNode.getNodeId());
 			client.sendMsg(msg);
 		}
+		isInsideCS = false;
 	}
 
 	public synchronized void handleFailedMessage(Integer nodeId) {

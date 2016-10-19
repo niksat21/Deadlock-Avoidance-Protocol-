@@ -2,20 +2,20 @@ package com.aos.lab2;
 
 public class CSRequest implements Comparable<CSRequest> {
 
-	private Node node;
-	private long timestamp;
+	private Integer nodeId;
+	private Long timestamp;
 
-	public CSRequest(Node node, long timestamp) {
+	public CSRequest(Integer node, Long timestamp) {
 		super();
-		this.node = node;
+		this.nodeId = node;
 		this.timestamp = timestamp;
 	}
 
-	public Node getNode() {
-		return node;
+	public Integer getNodeId() {
+		return nodeId;
 	}
 
-	public long getTimestamp() {
+	public Long getTimestamp() {
 		return timestamp;
 	}
 
@@ -26,7 +26,7 @@ public class CSRequest implements Comparable<CSRequest> {
 		else if (o.getTimestamp() > this.timestamp)
 			return 1;
 		else {
-			if (o.getNode().getNodeId() < this.node.getNodeId())
+			if (o.getNodeId() < this.nodeId)
 				return -1;
 			else
 				return 1;

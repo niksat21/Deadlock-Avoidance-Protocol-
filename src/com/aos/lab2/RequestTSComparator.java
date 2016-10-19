@@ -12,7 +12,7 @@ class RequestTSComparator implements Comparator<CSRequest> {
 			return 1;
 		} else {
 			// If the Timestamps are equal, then order it by nodeId
-			if (o1.getNode().getNodeId() < o2.getNode().getNodeId())
+			if (o1.getNodeId() < o2.getNodeId())
 				return -1;
 			else
 				return 1;

@@ -1,9 +1,9 @@
 package com.aos.lab2;
 
 public interface ICriticalSectionHandler {
-	
-	public void csEnter();
-	
+
+	public void csEnter(Long timestamp) throws InterruptedException;
+
 	public void csLeave();
 
 }

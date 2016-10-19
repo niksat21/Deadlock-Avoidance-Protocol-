@@ -2,7 +2,7 @@ package com.aos.lab2;
 
 public class Node {
 
-	private int nodeId;
+	private Integer nodeId;
 	private String hostname;
 	private Integer port;
 
@@ -21,7 +21,7 @@ public class Node {
 		return hostname;
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return port;
 	}
 

@@ -11,6 +11,7 @@ public class Message {
 	private Integer value;
 	private MessageType msgType;
 	private Integer port;
+	private Long requestTS;
 
 	public Message(Integer source, Integer destination, Integer port, List<Integer> path, Integer value,
 			MessageType msgType) {
@@ -28,6 +29,19 @@ public class Message {
 		this.destination = destination;
 		this.msgType = msgType;
 		this.port = port;
+	}
+
+	public Message(Integer source, Integer destination, MessageType msgType, Integer port, Long requestTS) {
+		super();
+		this.source = source;
+		this.destination = destination;
+		this.msgType = msgType;
+		this.port = port;
+		this.requestTS = requestTS;
+	}
+
+	public Long getRequestTS() {
+		return requestTS;
 	}
 
 	public Integer getSource() {

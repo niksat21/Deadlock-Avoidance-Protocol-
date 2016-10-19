@@ -1,5 +1,7 @@
 package com.aos.lab2;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.logging.log4j.LogManager;
@@ -13,19 +15,26 @@ public class QuorumRequestHandler {
 	private PriorityQueue<CSRequest> queue;
 	private Node quorumNode;
 	private Client client;
+	private Config config;
+	private Map<Integer, Integer> nodeIdVsPort = new HashMap<Integer, Integer>();
 
 	// TODO: Check if this has to be synchronized
 	private boolean hasGranted = false;
 	private CSRequest grantedRequest = null;
 
-	public QuorumRequestHandler(Node quorumNode, Client client) {
+	public QuorumRequestHandler(Node quorumNode, Client client, Config config) {
 		super();
 		this.quorumNode = quorumNode;
 		this.queue = new PriorityQueue<CSRequest>(requestComparator);
 		this.client = client;
+		this.config = config;
+
+		for (Node node : config.getNodes()) {
+			nodeIdVsPort.put(node.getNodeId(), node.getPort());
+		}
 	}
 
-	public void handleRequest(CSRequest request) {
+	public synchronized void handleRequest(CSRequest request) {
 		CSRequest previousReq = queue.peek();
 
 		// Add request to the queue
@@ -50,18 +59,13 @@ public class QuorumRequestHandler {
 
 	}
 
-	public void handleYieldMessage(Node sourceNode) {
-		logger.info("Received yield message from nodeId:{} in quorum nodeId:{}", sourceNode.getNodeId(),
-				quorumNode.getNodeId());
+	public synchronized void handleYieldMessage(Integer sourceNodeId) {
+		logger.info("Received yield message from nodeId:{} in quorum nodeId:{}", sourceNodeId, quorumNode.getNodeId());
 
-		// Add the request back to the queue, since it has not been allowed to
-		// enter CS
-		queue.add(grantedRequest);
-
-		if (grantedRequest.getNode() != sourceNode) {
+		if (grantedRequest.getNodeId() != sourceNodeId) {
 			logger.error(
 					"Something is wrong in quorum nodeId:{}. Received an yield message from nodeId:{} but the request was granted to nodeId:{}",
-					quorumNode.getNodeId(), sourceNode.getNodeId(), grantedRequest.getNode().getNodeId());
+					quorumNode.getNodeId(), sourceNodeId, grantedRequest.getNodeId());
 		}
 
 		if (queue.isEmpty()) {
@@ -76,50 +80,54 @@ public class QuorumRequestHandler {
 		}
 	}
 
-	public void handleReleaseMessage(Node sourceNode, Message msg) {
-		logger.info("Received release message from nodeId:{} in quorum nodeId:{}", sourceNode.getNodeId(),
-				quorumNode.getNodeId());
-		CSRequest request = queue.remove();
+	public synchronized void handleReleaseMessage(Integer sourceNode, Message msg) {
+		logger.info("Received release message from nodeId:{} in quorum nodeId:{}", sourceNode, quorumNode.getNodeId());
 
-		if (grantedRequest.getNode() != sourceNode) {
+		if (!queue.remove(grantedRequest))
+			logger.error(
+					"Unable to find the request from nodeId:{} with TS:{} in the quorum nodeId:{} when handling release message",
+					grantedRequest.getNodeId(), grantedRequest.getTimestamp(), quorumNode.getNodeId());
+
+		if (grantedRequest.getNodeId() != sourceNode) {
 			logger.error(
 					"The nodeId:{} from which release message is obtained is not same as the nodeId:{} to which request was granted in the quorum nodeId:{}",
-					sourceNode.getNodeId(), request.getNode().getNodeId());
+					sourceNode, grantedRequest.getNodeId());
 		}
 
 		if (!queue.isEmpty()) {
 			// Send grant message to the next request
-			request = queue.remove();
+			CSRequest request = queue.remove();
 			sendGrantMessage(request);
 		} else {
+			hasGranted = false;
+			grantedRequest = null;
 			logger.debug("No other request to be satisfied from quorum nodeId:{}", quorumNode.getNodeId());
 		}
 
 	}
 
 	private void sendInquireMessage(CSRequest request, CSRequest previousReq) {
-		Message msg = new Message(quorumNode.getNodeId(), previousReq.getNode().getNodeId(), MessageType.INQUIRE,
-				previousReq.getNode().getPort());
+		Message msg = new Message(quorumNode.getNodeId(), previousReq.getNodeId(), MessageType.INQUIRE,
+				nodeIdVsPort.get(previousReq.getNodeId()));
 		logger.info(
 				"Sending inquire message to nodeId:{} from quorum nodeId:{} as request with TS:{} from nodeId:{} has to be serviced",
-				previousReq.getNode().getNodeId(), quorumNode.getNodeId(), request.getTimestamp(),
-				request.getNode().getNodeId());
+				previousReq.getNodeId(), quorumNode.getNodeId(), request.getTimestamp(), request.getNodeId());
 		client.sendMsg(msg);
 	}
 
 	private Message sendGrantMessage(CSRequest request) {
-		Message msg = new Message(quorumNode.getNodeId(), request.getNode().getNodeId(), MessageType.GRANT,
-				request.getNode().getPort());
+		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.GRANT,
+				nodeIdVsPort.get(request.getNodeId()));
 		logger.info("Sending grant message to the requesting nodeId:{} from the quorum nodeId:{} .Request TS:{}",
-				request.getNode().getNodeId(), quorumNode.getNodeId(), request.getTimestamp());
+				request.getNodeId(), quorumNode.getNodeId(), request.getTimestamp());
 		return msg;
 	}
 
 	private void sendFailedMessage(CSRequest request) {
-		Message msg = new Message(quorumNode.getNodeId(), request.getNode().getNodeId(), MessageType.FAILED,
-				request.getNode().getPort());
-		logger.info("Sending failed message to the requesting nodeId:{} from quorum nodeId:{}",
-				request.getNode().getNodeId(), quorumNode.getNodeId());
+		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.FAILED,
+				nodeIdVsPort.get(request.getNodeId()));
+		logger.info("Sending failed message to the requesting nodeId:{} from quorum nodeId:{}", request.getNodeId(),
+				quorumNode.getNodeId());
 		client.sendMsg(msg);
 	}
 

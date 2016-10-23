@@ -1,114 +1,124 @@
-package com.aos.lab2;
+//package com.aos.lab2;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigParser {
 
-	private String fileLocation = System.getProperty("config", "conf/config.txt");
+    //private String fileLocation = System.getProperty("config", "C://Fall16/AOS/Project/Project2/config.txt");
+    private String fileLocation = System.getProperty("config", "conf/config.txt");
 
-	private Config config;
+    private Config config;
 
-	public ConfigParser() throws IOException {
-		parseConfig();
-	}
+    public ConfigParser() throws IOException {
+        parseConfig();
+    }
 
-	private void parseConfig() throws IOException {
-		List<String> fileContent = Files.readAllLines(Paths.get(fileLocation));
-		Iterator<String> iterator = fileContent.iterator();
-		List<Node> nodes = new LinkedList<Node>();
-		Map<Integer, List<Integer>> nodeIdVsPath = new HashMap<Integer, List<Integer>>();
-		int noOfNodes;
+    private void parseConfig() throws IOException {
+        List<String> fileContent = Files.readAllLines(Paths.get(fileLocation));
+        Iterator<String> iterator = fileContent.iterator();
+        List<Node> nodes = new LinkedList<Node>();
+        Map<Integer, List<Integer>> nodeIdVsQuorum = new HashMap<Integer, List<Integer>>();
+        int noOfNodes;
+        int csExecTime;
+        int waitTime;
+        int noOfAttempts;
 
-		String line = getNextLine(iterator);
+        String line = getNextLine(iterator);
 
-		// Ignore comments
-		while (line.startsWith("#") || line.isEmpty()) {
-			line = getNextLine(iterator);
-		}
+        // Ignore comments
+        while (line.startsWith("#") || line.isEmpty()) {
+            line = getNextLine(iterator);
+        }
 
-		String val = line.trim();
-		noOfNodes = Integer.valueOf(val);
-		line = getNextLine(iterator);
+        String[] val =  line.split(" ");
+        noOfNodes = Integer.valueOf(val[0]);
+        csExecTime = Integer.valueOf(val[1]);
+        waitTime = Integer.valueOf(val[2]);
+        noOfAttempts = Integer.valueOf(val[3]);
 
-		for (int i = 0; i < noOfNodes && iterator.hasNext(); line = getNextLine(iterator)) {
-			// Ignore comments
-			if (line.startsWith("#") || line.isEmpty())
-				continue;
 
-			String[] split = line.split("\\s+");
-			Node node = new Node(Integer.valueOf(split[0]), split[1] + ".utdallas.edu", Integer.valueOf(split[2]));
-			nodes.add(node);
-			i++;
-		}
+        line = getNextLine(iterator);
 
-		for (int i = 0; i < noOfNodes; line = getNextLine(iterator)) {
-			// Ignore comments
-			if (line.startsWith("#") || line.isEmpty())
-				continue;
-			line = line.trim();
-			String[] split = line.split("\t");
-			int j = 1;
-			Integer nodeId = Integer.valueOf(split[0]);
-			for (; j < split.length; j++) {
-				if (split[j].length() == 0)
-					continue;
-				else
-					break;
-			}
+        //
+        for (int i = 0; i < noOfNodes && iterator.hasNext(); line = getNextLine(iterator)) {
+            // Ignore comments
+            if (line.startsWith("#") || line.isEmpty())
+                continue;
 
-			List<Integer> path = parsePath(split[j]);
-			nodeIdVsPath.put(nodeId, path);
-			i++;
-		}
-		config = new Config(noOfNodes, nodes, nodeIdVsPath);
-	}
+            String[] split = line.split("\\s+");
 
-	private String getNextLine(Iterator<String> iterator) {
-		String line = null;
-		while (iterator.hasNext()) {
-			line = iterator.next();
-			line = line.trim();
-			if (line.startsWith("#") || line.isEmpty())
-				continue;
-			else
-				break;
-		}
-		return line;
-	}
+            Node node = new Node(Integer.valueOf(split[0]), split[1], Integer.valueOf(split[2]));
 
-	private List<Integer> parsePath(String string) {
-		List<Integer> path = new LinkedList<Integer>();
-		String[] split = string.split(",");
+            nodes.add(node);
+            i++;
+        }
 
-		path.add(Integer.valueOf(split[0].split("\\(")[1].trim()));
-		for (int i = 1; i < split.length - 1; i++) {
-			path.add(Integer.valueOf(split[i].trim()));
-		}
+        for (int i = 0; i < noOfNodes; line = getNextLine(iterator)) {
+            // Ignore comments
 
-		path.add(Integer.valueOf(split[split.length - 1].split("\\)")[0].trim()));
-		return path;
-	}
+            if (line.startsWith("#") || line.isEmpty())
+                continue;
+            line = line.trim();
 
-	public Config getConfig() {
-		return config;
-	}
+            String[] split = line.split(" ");
+            int j = 1;
+            Integer nodeId = Integer.valueOf(split[0]);
+            List<Integer> quorum = new ArrayList<>();
 
-	public static void main(String[] args) {
-		try {
-			ConfigParser parser = new ConfigParser();
-			Config config2 = parser.getConfig();
-			System.out.println(config2);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+            for(;j<split.length;j++){
+                quorum.add(Integer.valueOf(split[j]));
+            }
+
+            nodeIdVsQuorum.put(nodeId, quorum);
+            i++;
+        }
+        config = new Config(noOfNodes,csExecTime,waitTime,noOfAttempts, nodes, nodeIdVsQuorum);
+    }
+
+    private String getNextLine(Iterator<String> iterator) {
+        String line = null;
+        while (iterator.hasNext()) {
+            line = iterator.next();
+            line = line.trim();
+            if (line.startsWith("#") || line.isEmpty())
+                continue;
+            else
+                break;
+        }
+        return line;
+    }
+
+    private List<Integer> parsePath(String string) {
+        List<Integer> path = new LinkedList<Integer>();
+        String[] split = string.split(",");
+
+        path.add(Integer.valueOf(split[0].split("\\(")[1].trim()));
+        for (int i = 1; i < split.length - 1; i++) {
+            path.add(Integer.valueOf(split[i].trim()));
+        }
+
+        path.add(Integer.valueOf(split[split.length - 1].split("\\)")[0].trim()));
+        return path;
+    }
+
+
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public static void main(String[] args) {
+        try {
+            ConfigParser parser = new ConfigParser();
+            Config config2 = parser.getConfig();
+            System.out.println(config2.checkIntersection());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
 }

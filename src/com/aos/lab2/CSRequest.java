@@ -11,6 +11,11 @@ public class CSRequest implements Comparable<CSRequest> {
 		this.timestamp = timestamp;
 	}
 
+	public CSRequest(Integer node) {
+		super();
+		this.nodeId = node;
+	}
+
 	public Integer getNodeId() {
 		return nodeId;
 	}
@@ -21,12 +26,12 @@ public class CSRequest implements Comparable<CSRequest> {
 
 	@Override
 	public int compareTo(CSRequest o) {
-		if (o.getTimestamp() < this.timestamp)
+		if (this.timestamp < o.getTimestamp())
 			return -1;
-		else if (o.getTimestamp() > this.timestamp)
+		else if (this.timestamp > o.getTimestamp())
 			return 1;
 		else {
-			if (o.getNodeId() < this.nodeId)
+			if (this.nodeId < o.getNodeId())
 				return -1;
 			else
 				return 1;

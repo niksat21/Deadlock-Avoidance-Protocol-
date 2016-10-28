@@ -47,6 +47,8 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		}
 		while (true) {
 			synchronized (this) {
+				// TODO: Check if the requesting node is also in quorum set. If
+				// so, then check with size - 1
 				if (failedSet.size() == 0 && grantSet.size() == quorumSet.size())
 					break;
 			}

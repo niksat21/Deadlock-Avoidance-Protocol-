@@ -8,9 +8,9 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CircularQuorumRequestHandler {
+public class HoldAndWaitQuorumRequestHandler {
 
-	private static Logger logger = LogManager.getLogger(CircularWaitCSHandler.class);
+	private static Logger logger = LogManager.getLogger(HoldAndWaitCSHandler.class);
 
 	private List<CSRequest> requestQueue = new LinkedList<CSRequest>();
 	private Node quorumNode;
@@ -18,7 +18,7 @@ public class CircularQuorumRequestHandler {
 	private Config config;
 	private Map<Integer, Integer> nodeIdVsPort = new HashMap<Integer, Integer>();
 
-	public CircularQuorumRequestHandler(List<CSRequest> requestQueue, Node quorumNode, Client client, Config config,
+	public HoldAndWaitQuorumRequestHandler(List<CSRequest> requestQueue, Node quorumNode, Client client, Config config,
 			Map<Integer, Integer> nodeIdVsPort) {
 		super();
 		this.requestQueue = requestQueue;

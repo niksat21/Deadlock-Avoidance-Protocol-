@@ -5,9 +5,9 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CircularWaitCSHandler implements ICriticalSectionHandler {
+public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 
-	private static final Logger logger = LogManager.getLogger(CircularWaitCSHandler.class);
+	private static final Logger logger = LogManager.getLogger(HoldAndWaitCSHandler.class);
 	private static final int DEFAULT_SLEEP_TIME = 100;
 
 	private Config config;
@@ -17,7 +17,7 @@ public class CircularWaitCSHandler implements ICriticalSectionHandler {
 	private Integer requestedNodeId = null;
 	private boolean waitingForReply = false;
 
-	public CircularWaitCSHandler(Config config, Node sourceNode, Client client, Set<Node> quorumSet) {
+	public HoldAndWaitCSHandler(Config config, Node sourceNode, Client client, Set<Node> quorumSet) {
 		super();
 		this.config = config;
 		this.sourceNode = sourceNode;

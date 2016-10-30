@@ -42,8 +42,8 @@ public class ConfigParser {
 
 		String[] val = line.split(" ");
 		noOfNodes = Integer.valueOf(val[0]);
-		csExecTime = Integer.valueOf(val[1]);
-		waitTime = Integer.valueOf(val[2]);
+		csExecTime = Integer.valueOf(val[2]);
+		waitTime = Integer.valueOf(val[1]);
 		noOfAttempts = Integer.valueOf(val[3]);
 
 		line = getNextLine(iterator);

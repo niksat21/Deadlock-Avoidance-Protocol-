@@ -1,9 +1,10 @@
 package com.aos.lab2;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Message {
+public class Message implements Serializable{
 
 	private Integer source;
 	private Integer destination;

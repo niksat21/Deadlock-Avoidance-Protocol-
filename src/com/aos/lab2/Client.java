@@ -77,6 +77,7 @@ public class Client implements Runnable {
 
 	public void sendMsg(Message msg) {
 		SocketAddress socketAddress = nodeVsSocket.get(msg.getDestination());
+		logger.debug("Just above dest debug",nodeVsSocket);
 		logger.debug("Destination socket here is:{} ::{}",msg.getDestination(),socketAddress);
 		while (true) {
 			try {
@@ -99,6 +100,12 @@ public class Client implements Runnable {
 			} catch (Exception e) {
 				logger.warn("Exception in Send()" + e);
 				e.printStackTrace();
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 	
 		}

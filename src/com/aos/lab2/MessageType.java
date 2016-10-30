@@ -1,6 +1,8 @@
 package com.aos.lab2;
 
-public enum MessageType {
+import java.io.Serializable;
+
+public enum MessageType implements Serializable{
 
 	COMPLETED, DATA, INQUIRE, REQUEST, RELEASE, GRANT, YIELD, FAILED
 

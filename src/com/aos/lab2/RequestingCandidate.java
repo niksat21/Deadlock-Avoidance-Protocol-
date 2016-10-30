@@ -1,6 +1,11 @@
 package com.aos.lab2;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class RequestingCandidate {
+
+	private static final Logger logger = LogManager.getLogger(RequestingCandidate.class);
 
 	private Config config;
 	private Integer nodeId;
@@ -23,20 +28,24 @@ public class RequestingCandidate {
 			while (count <= noOfRequests) {
 				PreemptiveCSHandler pcsh = new PreemptiveCSHandler(config, node, client,
 						config.getNodeQuorumById(nodeId));
+				logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
 				pcsh.csEnter(System.currentTimeMillis());
 				// sleep till CS is executed
 				Thread.sleep(getExpoRandom(config.getCsExecTime()));
 				pcsh.csLeave();
+				logger.info("Critical Section: Leave NodeId:{}", node.getNodeId());
 				count++;
 			}
 		} else if (version.equals(DeadlockResolverType.HOLD_AND_WAIT)) {
 			while (count <= noOfRequests) {
 				HoldAndWaitCSHandler hwcsh = new HoldAndWaitCSHandler(config, node, client,
 						config.getNodeQuorumById(nodeId));
+				logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
 				hwcsh.csEnter(System.currentTimeMillis());
 				// sleep till CS is executed
 				Thread.sleep(getExpoRandom(config.getCsExecTime()));
 				hwcsh.csLeave();
+				logger.info("Critical Section: Leave NodeId:{}", node.getNodeId());
 				count++;
 			}
 		}

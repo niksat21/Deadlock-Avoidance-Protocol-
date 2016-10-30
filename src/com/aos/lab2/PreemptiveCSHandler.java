@@ -12,14 +12,14 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	private static final int DEFAULT_SLEEP_TIME = 100;
 
 	private Config config;
-	private Set<Node> quorumSet;
+	private Set<Integer> quorumSet;
 	private Set<Integer> grantSet;
 	private Set<Integer> failedSet;
 	private Node sourceNode;
 	private Client client;
 	private boolean isInsideCS = false;
 
-	public PreemptiveCSHandler(Config config, Node sourceNode, Client client, Set<Node> quorumSet) {
+	public PreemptiveCSHandler(Config config, Node sourceNode, Client client, Set<Integer> quorumSet) {
 		super();
 		this.config = config;
 		this.sourceNode = sourceNode;
@@ -32,10 +32,10 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	@Override
 	public void csEnter(Long timestamp) throws InterruptedException {
 		// Send request message to all the nodes in the quorum set
-		for (Node node : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.REQUEST);
-			logger.debug("Sending request message to nodeId:{} from nodeId:{}", node.getNodeId(),
-					sourceNode.getNodeId(), timestamp);
+		for (Integer nodeId : quorumSet) {
+			Message msg = new Message(sourceNode.getNodeId(), nodeId, MessageType.REQUEST);
+			logger.debug("Sending request message to nodeId:{} from nodeId:{}", nodeId, sourceNode.getNodeId(),
+					timestamp);
 			client.sendMsg(msg);
 		}
 		while (true) {
@@ -54,10 +54,9 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	@Override
 	public void csLeave() {
 		// Send release message to all the nodes in the quorum set
-		for (Node node : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.RELEASE);
-			logger.debug("Sending release message to nodeId:{} from nodeId:{}", node.getNodeId(),
-					sourceNode.getNodeId());
+		for (Integer nodeId : quorumSet) {
+			Message msg = new Message(sourceNode.getNodeId(), nodeId, MessageType.RELEASE);
+			logger.debug("Sending release message to nodeId:{} from nodeId:{}", nodeId, sourceNode.getNodeId());
 			client.sendMsg(msg);
 		}
 		isInsideCS = false;

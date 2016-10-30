@@ -14,11 +14,11 @@ public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 	private Config config;
 	private Node sourceNode;
 	private Client client;
-	private Set<Node> quorumSet;
+	private Set<Integer> quorumSet;
 	private Integer requestedNodeId = null;
 	private volatile boolean waitingForReply = false;
 
-	public HoldAndWaitCSHandler(Config config, Node sourceNode, Client client, Set<Node> quorumSet) {
+	public HoldAndWaitCSHandler(Config config, Node sourceNode, Client client, Set<Integer> quorumSet) {
 		super();
 		this.config = config;
 		this.sourceNode = sourceNode;
@@ -29,12 +29,12 @@ public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 	@Override
 	public void csEnter(Long timestamp) throws InterruptedException {
 		// Send request message to all the nodes in the quorum set
-		for (Node node : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.REQUEST);
-			logger.debug("Sending request message to nodeId:{} from nodeId:{}. Timestamp: {}", node.getNodeId(),
+		for (Integer nodeId : quorumSet) {
+			Message msg = new Message(sourceNode.getNodeId(), nodeId, MessageType.REQUEST);
+			logger.debug("Sending request message to nodeId:{} from nodeId:{}. Timestamp: {}", nodeId,
 					sourceNode.getNodeId(), timestamp);
 			client.sendMsg(msg);
-			requestedNodeId = node.getNodeId();
+			requestedNodeId = nodeId;
 			waitingForReply = true;
 			while (true) {
 				synchronized (this) {

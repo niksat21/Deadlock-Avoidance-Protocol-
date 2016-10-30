@@ -27,7 +27,7 @@ public class ConfigParser {
 		List<String> fileContent = Files.readAllLines(Paths.get(fileLocation));
 		Iterator<String> iterator = fileContent.iterator();
 		List<Node> nodes = new LinkedList<Node>();
-		Map<Integer, Set<Node>> nodeIdVsQuorum = new HashMap<Integer, Set<Node>>();
+		Map<Integer, Set<Integer>> nodeIdVsQuorum = new HashMap<Integer, Set<Integer>>();
 		int noOfNodes;
 		int csExecTime;
 		int waitTime;
@@ -72,10 +72,10 @@ public class ConfigParser {
 			String[] split = line.split(" ");
 			int j = 1;
 			Integer nodeId = Integer.valueOf(split[0]);
-			Set<Node> quorum = new TreeSet<Node>();
+			Set<Integer> quorum = new TreeSet<Integer>();
 
 			for (; j < split.length; j++) {
-				quorum.add(config.getNodeById(Integer.valueOf(split[j])));
+				quorum.add(Integer.valueOf(split[j].trim()));
 			}
 
 			nodeIdVsQuorum.put(nodeId, quorum);
@@ -118,7 +118,7 @@ public class ConfigParser {
 		try {
 			ConfigParser parser = new ConfigParser();
 			Config config2 = parser.getConfig();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

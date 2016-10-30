@@ -15,7 +15,7 @@ public class Process {
 //	private static Random rand = new Random();
 //	private static int labelValue = rand.nextInt(9) + 1;
 	private static Integer nodeId;
-    private String version = "preemptive";
+    //private String version = "preemptive";
 
 	public Process() {
 
@@ -25,6 +25,7 @@ public class Process {
 		try {
 			ConfigParser parser = new ConfigParser();
 			Config config = parser.getConfig();
+            config.setVersion(args[0]);
 			String hostname = InetAddress.getLocalHost().getHostName();
 			nodeId = Integer.valueOf(System.getProperty("nodeId"));
 			logger.info("Hostname:{} NodeId:{} Label value:{}", hostname, nodeId, labelValue);
@@ -32,30 +33,11 @@ public class Process {
 			Server server = new Server(nodeId, labelValue, node.getPort(), config);
 			Client client = new Client(hostname, labelValue, config, nodeId);
 			server.setClientHandler(client);
-//			Thread clientThread = new Thread(client, "client-thread");
+			Thread clientThread = new Thread(client, "client-thread");
 			Thread serverThread = new Thread(server, "server-thread");
 
-//			clientThread.start();
-            //sleep for some random time before making request for CS
-            Thread.sleep(getExpoRandom(config.getWaitTime()));
-            if(version.equals("preemptive")){
-                PreemptiveCSHandler pcsh = new PreemptiveCSHandler(config,nodeId,client,config.getNodeQuorumById(nodeId));
-                pcsh.csEnter(System.currentTimeMillis());
-                //sleep till CS is executed
-                Thread.sleep(getExpoRandom(config.getCsExecTime()));
-                pcsh.csLeave();
-            }
-            else if(version.equals("holdwait")){
-                HoldAndWaitCSHandler hwcsh = new HoldAndWaitCSHandler(config,nodeId,client,config.getNodeQuorumById(nodeId));
-                hwcsh.csEnter(System.currentTimeMillis());
-                //sleep till CS is executed
-                Thread.sleep(getExpoRandom(config.getCsExecTime()));
-                hwcsh.csLeave();
-            }
-
-
-
-			serverThread.start();
+			clientThread.start();
+            serverThread.start();
 
 //			while (true) {
 //				if (ServerWorker.isCompleted()) {

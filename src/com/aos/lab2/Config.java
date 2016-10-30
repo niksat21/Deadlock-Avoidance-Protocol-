@@ -16,6 +16,9 @@ public class Config {
 	private Map<Integer, Set<Integer>> nodeIdVsQuorum = new HashMap<Integer, Set<Integer>>();
 	private Map<Integer, Node> nodeIdVsNodes = new HashMap<Integer, Node>();
 
+
+	private String version=null;
+
 	public Config(int noOfNodes, int csExecTime, int waitTime, int noOfAttempts, List<Node> nodes,
 			Map<Integer, Set<Integer>> nodeIdVsPath) {
 		super();
@@ -61,6 +64,15 @@ public class Config {
 	public Node getNodeById(Integer id) {
 		return nodeIdVsNodes.get(id);
 	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
 
 	// public Boolean checkIntersection() {
 	// int counter = 0;

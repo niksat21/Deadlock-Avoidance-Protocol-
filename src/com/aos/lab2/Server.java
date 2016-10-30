@@ -46,34 +46,14 @@ public class Server implements Runnable {
 		quorumRequestHandler.setClientHandler(client);
 	}
 
-	private void listenForConnections()
-			throws /* UnknownHostException, IOException */Exception {
-		// ServerSocket socket = new ServerSocket(port);
+	private void listenForConnections() throws Exception {
 		SctpServerChannel ssc = SctpServerChannel.open();
 		InetSocketAddress serverAddr = new InetSocketAddress(port);
 		ssc.bind(serverAddr);
 		AssociationHandler assocHandler = new AssociationHandler();
 		try {
 			while (true) {
-				logger.debug("Listening for connection on hostname:{} port:{}"/*
-																				 * ,
-																				 * socket
-																				 * .
-																				 * getInetAddress
-																				 * (
-																				 * )
-																				 * .
-																				 * getHostAddress
-																				 * (
-																				 * )
-																				 * ,
-																				 * socket
-																				 * .
-																				 * getLocalPort
-																				 * (
-																				 * )
-																				 */);
-				// Socket sock = socket.accept();
+				logger.debug("Listening for connection on hostname:{} port:{}");
 				SctpChannel sc = ssc.accept();
 				ServerWorker worker = new ServerWorker(nodeId, sc, client, labelValue, config, assocHandler,
 						quorumRequestHandler);
@@ -92,16 +72,12 @@ public class Server implements Runnable {
 			if (not.event().equals(AssociationChangeNotification.AssocChangeEvent.COMM_UP)) {
 				int outbound = not.association().maxOutboundStreams();
 				int inbound = not.association().maxInboundStreams();
-				// stream.printf("New association setup with %d outbound
-				// streams" +
-				// ", and %d inbound streams.\n", outbound, inbound);
 			}
 
 			return HandlerResult.CONTINUE;
 		}
 
 		public HandlerResult handleNotification(ShutdownNotification not, PrintStream stream) {
-			// stream.printf("The association has been shutdown.\n");
 			return HandlerResult.RETURN;
 		}
 	}

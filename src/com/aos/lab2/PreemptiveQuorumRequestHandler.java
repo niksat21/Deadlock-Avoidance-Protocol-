@@ -1,7 +1,5 @@
 package com.aos.lab2;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,7 +14,6 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 	private Node quorumNode;
 	private Client client;
 	private Config config;
-	private Map<Integer, Integer> nodeIdVsPort = new HashMap<Integer, Integer>();
 
 	// TODO: Check if this has to be synchronized
 	private boolean hasGranted = false;
@@ -26,12 +23,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 		super();
 		this.quorumNode = quorumNode;
 		this.queue = new PriorityQueue<CSRequest>(requestComparator);
-		this.client = client;
 		this.config = config;
-
-		for (Node node : config.getNodes()) {
-			nodeIdVsPort.put(node.getNodeId(), node.getPort());
-		}
 	}
 
 	public synchronized void handleRequestMessage(CSRequest request) {
@@ -96,7 +88,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 
 		if (!queue.isEmpty()) {
 			// Send grant message to the next request
-			CSRequest request = queue.remove();
+			CSRequest request = queue.peek();
 			sendGrantMessage(request);
 		} else {
 			hasGranted = false;

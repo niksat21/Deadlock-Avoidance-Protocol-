@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.sun.nio.sctp.MessageInfo;
 import com.sun.nio.sctp.SctpChannel;
 
@@ -41,8 +40,6 @@ public class Client implements Runnable {
 				if (node.getNodeId().equals(nodeId))
 					continue;
 				logger.debug("Trying to create connection with host:{} port:{}", node.getHostname(), node.getPort());
-				// Socket socket = new Socket(node.getHostname(),
-				// node.getPort());
 				SocketAddress socketAddress = new InetSocketAddress(node.getHostname(), node.getPort());
 				nodeVsSocket.put(node.getNodeId(), socketAddress);
 				logger.debug("Successfully created socket connection to host:{} from:{} ", node.getHostname(),
@@ -73,45 +70,15 @@ public class Client implements Runnable {
 			logger.debug("Sleeping for 8 seconds until other nodes come up");
 			Thread.sleep(8000);
 			createSockets(config.getNodes());
-			if (config.getNodeQuorumById(nodeId).size() != 0) {
-				RequestingCandidate rc = new RequestingCandidate(config, nodeId, this);
-				rc.requestCS();
-			}
-			// initiateMsg();
-
 		} catch (Exception e) {
 			logger.error("Problem in client thread.", e);
 		}
 	}
 
 	public void sendMsg(Message msg) {
-		// Socket socket = nodeVsSocket.get(msg.getDestination());
 		SocketAddress socketAddress = nodeVsSocket.get(msg.getDestination());
-		Gson gson = new Gson();
-		String json = gson.toJson(msg);
 		while (true) {
 			try {
-				// if (socket != null) {
-				// logger.debug("Trying to send msg:{} from nodeId:{}", json,
-				// nodeId);
-				// DataOutputStream outputStream = new
-				// DataOutputStream(socket.getOutputStream());
-				// outputStream.writeUTF(json + "\n");
-				// logger.debug("Successfully placed msg: {} in the stream to
-				// host:{}", json,
-				// socket.getRemoteSocketAddress());
-				// break;
-				// } else {
-				// logger.error(
-				// "Unable to find socket for msg:{} destination nodeId:{}.
-				// SocketMap: {} Retry after 5 seconds",
-				// json, msg.getDestination(), nodeVsSocket);
-				// Thread.sleep(5000);
-				// }
-				// } catch (Exception e) {
-				// logger.error("Exception in client thread", e);
-				// }
-				// }
 				SctpChannel sctpChannel = SctpChannel.open();
 				sctpChannel.connect(socketAddress);
 
@@ -127,33 +94,13 @@ public class Client implements Runnable {
 
 				bos.close();
 				buf.clear();
-				// return true;
 			} catch (Exception e) {
 				logger.warn("Exception in Send()" + e);
-				// System.err.println(e);
 				e.printStackTrace();
-				// return false;
 			}
+			return;
 		}
 	}
-
-	// private void initiateMsg() {
-	// for (Node node : config.getNodes()) {
-	// if (node.getNodeId().equals(nodeId)) {
-	// List<Integer> path = config.getNodePathById(node.getNodeId());
-	// if (path != null && !path.isEmpty()) {
-	// Node dest = config.getNodeById(path.remove(0));
-	// Message msg = new Message(node.getNodeId(), dest.getNodeId(),
-	// dest.getPort(), path, labelValue,
-	// MessageType.DATA);
-	// sendMsg(msg);
-	// } else {
-	// logger.warn("No message to initiate from nodeId:" + node.getNodeId());
-	// }
-	// break;
-	// }
-	// }
-	// }
 
 	public void broadcastCompletionMsg() {
 		logger.debug("Broadcasting completion message from host:{}", nodeHostname);

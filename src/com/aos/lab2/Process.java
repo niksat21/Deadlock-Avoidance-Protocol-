@@ -12,23 +12,20 @@ public class Process {
 	private static Random rand = new Random();
 	private static int labelValue = rand.nextInt(9) + 1;
 	private static Integer nodeId;
-	// private String version = "preemptive";
-
-	public Process() {
-
-	}
 
 	public static void main(String[] args) {
 		try {
 			ConfigParser parser = new ConfigParser();
 			Config config = parser.getConfig();
 
-			if (args[0].equals("holdandwait")) {
+			String version = System.getProperty("version");
+
+			if (version.equals("holdandwait")) {
 				config.setVersion(DeadlockResolverType.HOLD_AND_WAIT);
-			} else if (args[0].equals("preemptive")) {
+			} else if (version.equals("preemptive")) {
 				config.setVersion(DeadlockResolverType.PREEMPTIVE);
 			} else {
-				logger.error("Unsupported version: {}", args[0]);
+				logger.error("Unsupported version: {}", version);
 			}
 
 			String hostname = InetAddress.getLocalHost().getHostName();
@@ -55,17 +52,13 @@ public class Process {
 			clientThread.start();
 			serverThread.start();
 
-			// while (true) {
-			// if (ServerWorker.isCompleted()) {
-			// serverThread.interrupt();
-			// Thread.sleep(2000);
-			// writeOutputToFile(hostname);
-			// System.exit(0);
-			// break;
-			// }
-			// Thread.sleep(3000);
-			// }
-			//
+			Thread.sleep(5000);
+
+			if (config.getNodeQuorumById(nodeId).size() != 0) {
+				RequestingCandidate rc = new RequestingCandidate(config, nodeId, client);
+				rc.requestCS();
+			}
+
 		} catch (Exception e) {
 			logger.error("Exception in Process", e);
 		}

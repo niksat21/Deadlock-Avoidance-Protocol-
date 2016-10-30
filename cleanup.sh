@@ -2,11 +2,11 @@
 
 
 # Change this to your netid
-netid=kxm153630
+netid=axr140930
 
 #
 # Root directory of your project
-PROJDIR=/home/012/k/kx/kxm153630/com.aos.lab1
+PROJDIR=/home/010/a/ax/axr140930/AOS_Project2/com.aos.lab2
 
 #
 # This assumes your config file is named "config.txt"
@@ -22,7 +22,7 @@ BINDIR=$PROJDIR/bin
 #
 # Your main project class
 #
-PROG=com.aos.lab1.Process
+PROG=com.aos.lab2.Process
 
 n=1
 

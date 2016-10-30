@@ -31,7 +31,7 @@ public class Client {
 		logger.debug("Sleeping for 8 seconds until other nodes come up");
 		Thread.sleep(8000);
 		createSockets(config.getNodes());
-		initiateMsg();
+		
 	}
 
 	// Open connections with every other node

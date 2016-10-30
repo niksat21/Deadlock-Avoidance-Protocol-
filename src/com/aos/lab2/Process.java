@@ -52,7 +52,7 @@ public class Process {
 			clientThread.start();
 			serverThread.start();
 
-			Thread.sleep(5000);
+			Thread.sleep(10000);
 
 			if (config.getNodeQuorumById(nodeId).size() != 0) {
 				RequestingCandidate rc = new RequestingCandidate(config, nodeId, client);

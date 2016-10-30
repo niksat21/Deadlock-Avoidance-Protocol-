@@ -28,8 +28,8 @@ public class RequestingCandidate {
 			while (count <= noOfRequests) {
 				PreemptiveCSHandler pcsh = new PreemptiveCSHandler(config, node, client,
 						config.getNodeQuorumById(nodeId));
-				logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
 				pcsh.csEnter(System.currentTimeMillis());
+				logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
 				// sleep till CS is executed
 				Thread.sleep(getExpoRandom(config.getCsExecTime()));
 				pcsh.csLeave();
@@ -40,8 +40,8 @@ public class RequestingCandidate {
 			while (count <= noOfRequests) {
 				HoldAndWaitCSHandler hwcsh = new HoldAndWaitCSHandler(config, node, client,
 						config.getNodeQuorumById(nodeId));
-				logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
 				hwcsh.csEnter(System.currentTimeMillis());
+				logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
 				// sleep till CS is executed
 				Thread.sleep(getExpoRandom(config.getCsExecTime()));
 				hwcsh.csLeave();

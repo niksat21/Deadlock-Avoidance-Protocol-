@@ -67,8 +67,8 @@ public class Client implements Runnable {
 	public void run() {
 		try {
 			// Sleep for sometime so that the other nodes come up.
-			logger.debug("Sleeping for 8 seconds until other nodes come up");
-			Thread.sleep(8000);
+			logger.debug("Sleeping for 5 seconds until other nodes come up");
+			Thread.sleep(5000);
 			createSockets(config.getNodes());
 		} catch (Exception e) {
 			logger.error("Problem in client thread.", e);
@@ -77,6 +77,7 @@ public class Client implements Runnable {
 
 	public void sendMsg(Message msg) {
 		SocketAddress socketAddress = nodeVsSocket.get(msg.getDestination());
+		logger.debug("Destination socket here is:{} ::{}",msg.getDestination(),socketAddress);
 		while (true) {
 			try {
 				SctpChannel sctpChannel = SctpChannel.open();
@@ -94,11 +95,12 @@ public class Client implements Runnable {
 
 				bos.close();
 				buf.clear();
+				return;
 			} catch (Exception e) {
 				logger.warn("Exception in Send()" + e);
 				e.printStackTrace();
 			}
-			return;
+	
 		}
 	}
 

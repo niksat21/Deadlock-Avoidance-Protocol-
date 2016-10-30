@@ -24,9 +24,9 @@ public class HoldAndWaitQuorumRequestHandler implements IQuorumRequestHandler {
 	@Override
 	public synchronized void handleReleaseMessage(Integer source) {
 		logger.debug("Received release message from nodeId:{} in quorum nodeId:{}", source, quorumNode.getNodeId());
-
 		if (requestQueue.size() != 0) {
-			CSRequest request = requestQueue.remove(0);
+			requestQueue.remove(0);
+			CSRequest request = requestQueue.get(0);
 			sendGrantMessage(request.getNodeId());
 		} else {
 			logger.debug("No pending request in the quorum nodeId:{}", quorumNode.getNodeId());

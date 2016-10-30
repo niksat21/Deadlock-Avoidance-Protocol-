@@ -54,7 +54,7 @@ public class Config {
 		return nodes;
 	}
 
-	public Set<Integer> getNodePathById(Integer id) {
+	public Set<Integer> getNodeQuorumById(Integer id) {
 		return nodeIdVsQuorum.get(id);
 	}
 

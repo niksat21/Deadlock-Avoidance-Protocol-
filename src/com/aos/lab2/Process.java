@@ -12,9 +12,10 @@ import org.apache.logging.log4j.Logger;
 public class Process {
 
 	private static Logger logger = LogManager.getLogger(Process.class);
-	private static Random rand = new Random();
-	private static int labelValue = rand.nextInt(9) + 1;
+//	private static Random rand = new Random();
+//	private static int labelValue = rand.nextInt(9) + 1;
 	private static Integer nodeId;
+    private String version = "preemptive";
 
 	public Process() {
 
@@ -31,35 +32,54 @@ public class Process {
 			Server server = new Server(nodeId, labelValue, node.getPort(), config);
 			Client client = new Client(hostname, labelValue, config, nodeId);
 			server.setClientHandler(client);
-			Thread clientThread = new Thread(client, "client-thread");
+//			Thread clientThread = new Thread(client, "client-thread");
 			Thread serverThread = new Thread(server, "server-thread");
 
-			clientThread.start();
+//			clientThread.start();
+            //sleep for some random time before making request for CS
+            Thread.sleep(getExpoRandom(config.getWaitTime()));
+            if(version.equals("preemptive")){
+                PreemptiveCSHandler pcsh = new PreemptiveCSHandler(config,nodeId,client,config.getNodeQuorumById(nodeId));
+                pcsh.csEnter(System.currentTimeMillis());
+                //sleep till CS is executed
+                Thread.sleep(getExpoRandom(config.getCsExecTime()));
+                pcsh.csLeave();
+            }
+            else if(version.equals("holdwait")){
+                HoldAndWaitCSHandler hwcsh = new HoldAndWaitCSHandler(config,nodeId,client,config.getNodeQuorumById(nodeId));
+                hwcsh.csEnter(System.currentTimeMillis());
+                //sleep till CS is executed
+                Thread.sleep(getExpoRandom(config.getCsExecTime()));
+                hwcsh.csLeave();
+            }
+
+
+
 			serverThread.start();
 
-			while (true) {
-				if (ServerWorker.isCompleted()) {
-					serverThread.interrupt();
-					Thread.sleep(2000);
-					writeOutputToFile(hostname);
-					System.exit(0);
-					break;
-				}
-				Thread.sleep(3000);
-			}
-
+//			while (true) {
+//				if (ServerWorker.isCompleted()) {
+//					serverThread.interrupt();
+//					Thread.sleep(2000);
+//					writeOutputToFile(hostname);
+//					System.exit(0);
+//					break;
+//				}
+//				Thread.sleep(3000);
+//			}
+//
 		} catch (Exception e) {
 			logger.error("Exception in Process", e);
 		}
 
 	}
 
-	private static void writeOutputToFile(String hostname) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(hostname + "_" + nodeId + ".txt"));
-		writer.write("Label value: " + labelValue);
-		writer.write("\nOutput value: " + ServerWorker.getResult());
-		writer.close();
-	}
+//	private static void writeOutputToFile(String hostname) throws IOException {
+//		BufferedWriter writer = new BufferedWriter(new FileWriter(hostname + "_" + nodeId + ".txt"));
+//		writer.write("Label value: " + labelValue);
+//		writer.write("\nOutput value: " + ServerWorker.getResult());
+//		writer.close();
+//	}
 
 	private static Integer getNodeId(String hostname, Config config) {
 		for (Node node : config.getNodes()) {
@@ -69,5 +89,15 @@ public class Process {
 		logger.error("Unable to find nodeId for hostname: {} in the list", hostname);
 		return null;
 	}
+
+	private static int getExpoRandom(int mean){
+
+        double temp = Math.random();
+        double exp = -(Math.log(temp)*mean);
+
+        return (int)exp;
+
+	}
+}
 
 }

@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 
-public class Client implements Runnable {
+public class Client {
 
 	private Map<Integer, Socket> nodeVsSocket = new HashMap<Integer, Socket>();
 	private Logger logger = LogManager.getLogger(Client.class);
@@ -28,6 +28,10 @@ public class Client implements Runnable {
 		this.labelValue = labelValue;
 		this.config = config;
 		this.nodeId = nodeId;
+		logger.debug("Sleeping for 8 seconds until other nodes come up");
+		Thread.sleep(8000);
+		createSockets(config.getNodes());
+		initiateMsg();
 	}
 
 	// Open connections with every other node
@@ -64,18 +68,18 @@ public class Client implements Runnable {
 	}
 
 	@Override
-	public void run() {
-		try {
-			// Sleep for sometime so that the other nodes come up.
-			logger.debug("Sleeping for 8 seconds until other nodes come up");
-			Thread.sleep(8000);
-			createSockets(config.getNodes());
-			initiateMsg();
-
-		} catch (Exception e) {
-			logger.error("Problem in client thread.", e);
-		}
-	}
+//	public void run() {
+//		try {
+//			// Sleep for sometime so that the other nodes come up.
+//			logger.debug("Sleeping for 8 seconds until other nodes come up");
+//			Thread.sleep(8000);
+//			createSockets(config.getNodes());
+//			initiateMsg();
+//
+//		} catch (Exception e) {
+//			logger.error("Problem in client thread.", e);
+//		}
+//	}
 
 	public void sendMsg(Message msg) {
 		Socket socket = nodeVsSocket.get(msg.getDestination());

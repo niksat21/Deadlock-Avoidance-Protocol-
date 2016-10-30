@@ -26,7 +26,7 @@ public class RequestingCandidate {
 		// sleep for some random time before making request for CS
 		Thread.sleep(getExpoRandom(config.getWaitTime()));
 		
-		while (count <= noOfRequests) {
+		while (count < noOfRequests) {
 			csHandler.csEnter(System.currentTimeMillis());
 			logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
 			logger.debug("noOfRequests :{} count:{} ",noOfRequests,count);

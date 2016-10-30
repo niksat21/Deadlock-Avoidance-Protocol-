@@ -29,7 +29,7 @@ public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 	public void csEnter(Long timestamp) throws InterruptedException {
 		// Send request message to all the nodes in the quorum set
 		for (Node node : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.REQUEST, node.getPort());
+			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.REQUEST);
 			logger.debug("Sending request message to nodeId:{} from nodeId:{}", node.getNodeId(),
 					sourceNode.getNodeId(), timestamp);
 			client.sendMsg(msg);

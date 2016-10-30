@@ -1,20 +1,17 @@
 package com.aos.lab2;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.sun.nio.sctp.AbstractNotificationHandler;
 import com.sun.nio.sctp.AssociationChangeNotification;
 import com.sun.nio.sctp.HandlerResult;
-import com.sun.nio.sctp.MessageInfo;
 import com.sun.nio.sctp.SctpChannel;
 import com.sun.nio.sctp.SctpServerChannel;
 import com.sun.nio.sctp.ShutdownNotification;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Server implements Runnable {
 
@@ -24,12 +21,15 @@ public class Server implements Runnable {
 	private Integer nodeId;
 	private Integer labelValue;
 	private Config config;
+	private IQuorumRequestHandler quorumRequestHandler;
 
-	public Server(Integer nodeId, Integer labelValue, Integer port, Config config) {
+	public Server(Integer nodeId, Integer labelValue, Integer port, Config config,
+			IQuorumRequestHandler quorumRequestHandler) {
 		this.nodeId = nodeId;
 		this.labelValue = labelValue;
 		this.port = port;
 		this.config = config;
+		this.quorumRequestHandler = quorumRequestHandler;
 	}
 
 	@Override
@@ -43,21 +43,40 @@ public class Server implements Runnable {
 
 	public void setClientHandler(Client client) {
 		this.client = client;
+		quorumRequestHandler.setClientHandler(client);
 	}
 
-	private void listenForConnections() throws /*UnknownHostException, IOException*/Exception {
-		//ServerSocket socket = new ServerSocket(port);
+	private void listenForConnections()
+			throws /* UnknownHostException, IOException */Exception {
+		// ServerSocket socket = new ServerSocket(port);
 		SctpServerChannel ssc = SctpServerChannel.open();
 		InetSocketAddress serverAddr = new InetSocketAddress(port);
 		ssc.bind(serverAddr);
 		AssociationHandler assocHandler = new AssociationHandler();
 		try {
 			while (true) {
-				logger.debug("Listening for connection on hostname:{} port:{}"/*,
-						socket.getInetAddress().getHostAddress(), socket.getLocalPort()*/);
-				//Socket sock = socket.accept();
+				logger.debug("Listening for connection on hostname:{} port:{}"/*
+																				 * ,
+																				 * socket
+																				 * .
+																				 * getInetAddress
+																				 * (
+																				 * )
+																				 * .
+																				 * getHostAddress
+																				 * (
+																				 * )
+																				 * ,
+																				 * socket
+																				 * .
+																				 * getLocalPort
+																				 * (
+																				 * )
+																				 */);
+				// Socket sock = socket.accept();
 				SctpChannel sc = ssc.accept();
-				ServerWorker worker = new ServerWorker(nodeId, sc, client, labelValue, config, assocHandler);
+				ServerWorker worker = new ServerWorker(nodeId, sc, client, labelValue, config, assocHandler,
+						quorumRequestHandler);
 				logger.debug("Created server worker");
 				Thread workerThread = new Thread(worker);
 				logger.debug("Created server worker thread");
@@ -67,26 +86,24 @@ public class Server implements Runnable {
 			ssc.close();
 		}
 	}
-	
-	static class AssociationHandler extends AbstractNotificationHandler<PrintStream>
-	{
-	   public HandlerResult handleNotification(AssociationChangeNotification not,
-	                                           PrintStream stream) {
-	       if (not.event().equals(AssociationChangeNotification.AssocChangeEvent.COMM_UP)) {
-	           int outbound = not.association().maxOutboundStreams();
-	           int inbound = not.association().maxInboundStreams();
-	           //stream.printf("New association setup with %d outbound streams" +
-	            //             ", and %d inbound streams.\n", outbound, inbound);
-	       }
 
-	       return HandlerResult.CONTINUE;
-	   }
+	static class AssociationHandler extends AbstractNotificationHandler<PrintStream> {
+		public HandlerResult handleNotification(AssociationChangeNotification not, PrintStream stream) {
+			if (not.event().equals(AssociationChangeNotification.AssocChangeEvent.COMM_UP)) {
+				int outbound = not.association().maxOutboundStreams();
+				int inbound = not.association().maxInboundStreams();
+				// stream.printf("New association setup with %d outbound
+				// streams" +
+				// ", and %d inbound streams.\n", outbound, inbound);
+			}
 
-	   public HandlerResult handleNotification(ShutdownNotification not,
-	                                           PrintStream stream) {
-	       //stream.printf("The association has been shutdown.\n");
-	       return HandlerResult.RETURN;
-	   }
+			return HandlerResult.CONTINUE;
+		}
+
+		public HandlerResult handleNotification(ShutdownNotification not, PrintStream stream) {
+			// stream.printf("The association has been shutdown.\n");
+			return HandlerResult.RETURN;
+		}
 	}
-	
+
 }

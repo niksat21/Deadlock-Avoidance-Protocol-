@@ -16,8 +16,7 @@ public class Config {
 	private Map<Integer, Set<Node>> nodeIdVsQuorum = new HashMap<Integer, Set<Node>>();
 	private Map<Integer, Node> nodeIdVsNodes = new HashMap<Integer, Node>();
 
-
-	private String version=null;
+	private DeadlockResolverType version = null;
 
 	public Config(int noOfNodes, int csExecTime, int waitTime, int noOfAttempts, List<Node> nodes,
 			Map<Integer, Set<Node>> nodeIdVsQuorum) {
@@ -65,14 +64,13 @@ public class Config {
 		return nodeIdVsNodes.get(id);
 	}
 
-	public String getVersion() {
+	public DeadlockResolverType getVersion() {
 		return version;
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(DeadlockResolverType version) {
 		this.version = version;
 	}
-
 
 	// public Boolean checkIntersection() {
 	// int counter = 0;

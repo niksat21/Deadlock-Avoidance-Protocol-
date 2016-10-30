@@ -10,33 +10,28 @@ public class Message {
 	private List<Integer> path = new LinkedList<Integer>();
 	private Integer value;
 	private MessageType msgType;
-	private Integer port;
 	private Long requestTS;
 
-	public Message(Integer source, Integer destination, Integer port, List<Integer> path, Integer value,
-			MessageType msgType) {
+	public Message(Integer source, Integer destination, List<Integer> path, Integer value, MessageType msgType) {
 		this.source = source;
 		this.destination = destination;
 		this.path = path;
 		this.value = value;
 		this.msgType = msgType;
-		this.port = port;
 	}
 
-	public Message(Integer source, Integer destination, MessageType msgType, Integer port) {
+	public Message(Integer source, Integer destination, MessageType msgType) {
 		super();
 		this.source = source;
 		this.destination = destination;
 		this.msgType = msgType;
-		this.port = port;
 	}
 
-	public Message(Integer source, Integer destination, MessageType msgType, Integer port, Long requestTS) {
+	public Message(Integer source, Integer destination, MessageType msgType, Long requestTS) {
 		super();
 		this.source = source;
 		this.destination = destination;
 		this.msgType = msgType;
-		this.port = port;
 		this.requestTS = requestTS;
 	}
 
@@ -78,14 +73,6 @@ public class Message {
 
 	public void setPath(List<Integer> path) {
 		this.path = path;
-	}
-
-	public Integer getPort() {
-		return port;
-	}
-
-	public void setPort(Integer port) {
-		this.port = port;
 	}
 
 }

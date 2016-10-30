@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class PreemptiveQuorumRequestHandler {
+public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 
 	private static final Logger logger = LogManager.getLogger(PreemptiveQuorumRequestHandler.class);
 
@@ -22,7 +22,7 @@ public class PreemptiveQuorumRequestHandler {
 	private boolean hasGranted = false;
 	private CSRequest grantedRequest = null;
 
-	public PreemptiveQuorumRequestHandler(Node quorumNode, Client client, Config config) {
+	public PreemptiveQuorumRequestHandler(Node quorumNode, Config config) {
 		super();
 		this.quorumNode = quorumNode;
 		this.queue = new PriorityQueue<CSRequest>(requestComparator);
@@ -34,7 +34,7 @@ public class PreemptiveQuorumRequestHandler {
 		}
 	}
 
-	public synchronized void handleRequest(CSRequest request) {
+	public synchronized void handleRequestMessage(CSRequest request) {
 		CSRequest previousReq = queue.peek();
 
 		// Add request to the queue
@@ -80,7 +80,7 @@ public class PreemptiveQuorumRequestHandler {
 		}
 	}
 
-	public synchronized void handleReleaseMessage(Integer sourceNode, Message msg) {
+	public synchronized void handleReleaseMessage(Integer sourceNode) {
 		logger.info("Received release message from nodeId:{} in quorum nodeId:{}", sourceNode, quorumNode.getNodeId());
 
 		if (!queue.remove(grantedRequest))
@@ -107,8 +107,7 @@ public class PreemptiveQuorumRequestHandler {
 	}
 
 	private void sendInquireMessage(CSRequest request, CSRequest previousReq) {
-		Message msg = new Message(quorumNode.getNodeId(), previousReq.getNodeId(), MessageType.INQUIRE,
-				nodeIdVsPort.get(previousReq.getNodeId()));
+		Message msg = new Message(quorumNode.getNodeId(), previousReq.getNodeId(), MessageType.INQUIRE);
 		logger.info(
 				"Sending inquire message to nodeId:{} from quorum nodeId:{} as request with TS:{} from nodeId:{} has to be serviced",
 				previousReq.getNodeId(), quorumNode.getNodeId(), request.getTimestamp(), request.getNodeId());
@@ -116,19 +115,22 @@ public class PreemptiveQuorumRequestHandler {
 	}
 
 	private void sendGrantMessage(CSRequest request) {
-		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.GRANT,
-				nodeIdVsPort.get(request.getNodeId()));
+		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.GRANT);
 		logger.info("Sending grant message to the requesting nodeId:{} from the quorum nodeId:{} .Request TS:{}",
 				request.getNodeId(), quorumNode.getNodeId(), request.getTimestamp());
 		client.sendMsg(msg);
 	}
 
 	private void sendFailedMessage(CSRequest request) {
-		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.FAILED,
-				nodeIdVsPort.get(request.getNodeId()));
+		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.FAILED);
 		logger.info("Sending failed message to the requesting nodeId:{} from quorum nodeId:{}", request.getNodeId(),
 				quorumNode.getNodeId());
 		client.sendMsg(msg);
+	}
+
+	@Override
+	public void setClientHandler(Client client) {
+		this.client = client;
 	}
 
 }

@@ -1,14 +1,12 @@
 package com.aos.lab2;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class HoldAndWaitQuorumRequestHandler {
+public class HoldAndWaitQuorumRequestHandler implements IQuorumRequestHandler {
 
 	private static Logger logger = LogManager.getLogger(HoldAndWaitCSHandler.class);
 
@@ -16,28 +14,14 @@ public class HoldAndWaitQuorumRequestHandler {
 	private Node quorumNode;
 	private Client client;
 	private Config config;
-	private Map<Integer, Integer> nodeIdVsPort = new HashMap<Integer, Integer>();
 
-	public HoldAndWaitQuorumRequestHandler(List<CSRequest> requestQueue, Node quorumNode, Client client, Config config,
-			Map<Integer, Integer> nodeIdVsPort) {
+	public HoldAndWaitQuorumRequestHandler(Node quorumNode, Config config) {
 		super();
-		this.requestQueue = requestQueue;
 		this.quorumNode = quorumNode;
-		this.client = client;
 		this.config = config;
-		this.nodeIdVsPort = nodeIdVsPort;
 	}
 
-	public synchronized void handleRequestMessage(Integer source) {
-		logger.debug("Received request message from nodeId:{} in quorum nodeId:{}", source, quorumNode.getNodeId());
-		CSRequest request = new CSRequest(source);
-		requestQueue.add(request);
-
-		if (requestQueue.size() == 1) {
-			sendGrantMessage(request.getNodeId());
-		}
-	}
-
+	@Override
 	public synchronized void handleReleaseMessage(Integer source) {
 		logger.debug("Received release message from nodeId:{} in quorum nodeId:{}", source, quorumNode.getNodeId());
 
@@ -49,12 +33,33 @@ public class HoldAndWaitQuorumRequestHandler {
 		}
 	}
 
-	public void sendGrantMessage(Integer destinationId) {
+	private void sendGrantMessage(Integer destinationId) {
 		logger.debug("Sending grant message to nodeId:{} from  quorum nodeId:{}", destinationId,
 				quorumNode.getNodeId());
-		Message msg = new Message(quorumNode.getNodeId(), destinationId, MessageType.GRANT,
-				nodeIdVsPort.get(destinationId));
+		Message msg = new Message(quorumNode.getNodeId(), destinationId, MessageType.GRANT);
 		client.sendMsg(msg);
+	}
+
+	@Override
+	public void handleYieldMessage(Integer sourceNodeId) {
+		logger.error("Calling unimplemented method: handleYieldMessage in HoldAndWait Quorum Request handler");
+	}
+
+	@Override
+	public void handleRequestMessage(CSRequest request) {
+		logger.debug("Received request message from nodeId:{} in quorum nodeId:{}", request.getNodeId(),
+				quorumNode.getNodeId());
+		requestQueue.add(request);
+
+		if (requestQueue.size() == 1) {
+			sendGrantMessage(request.getNodeId());
+		}
+
+	}
+
+	@Override
+	public void setClientHandler(Client client) {
+		this.client = client;
 	}
 
 }

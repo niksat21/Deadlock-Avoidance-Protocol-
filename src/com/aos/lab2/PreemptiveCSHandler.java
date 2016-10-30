@@ -1,8 +1,6 @@
 package com.aos.lab2;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +18,6 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	private Node sourceNode;
 	private Client client;
 	private boolean isInsideCS = false;
-	private Map<Integer, Integer> nodeIdVsPort = new HashMap<Integer, Integer>();
 
 	public PreemptiveCSHandler(Config config, Node sourceNode, Client client, Set<Node> quorumSet) {
 		super();
@@ -30,17 +27,13 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		this.quorumSet = quorumSet;
 		this.grantSet = new HashSet<Integer>();
 		this.failedSet = new HashSet<Integer>();
-
-		for (Node node : config.getNodes()) {
-			nodeIdVsPort.put(node.getNodeId(), node.getPort());
-		}
 	}
 
 	@Override
 	public void csEnter(Long timestamp) throws InterruptedException {
 		// Send request message to all the nodes in the quorum set
 		for (Node node : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.REQUEST, node.getPort());
+			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.REQUEST);
 			logger.debug("Sending request message to nodeId:{} from nodeId:{}", node.getNodeId(),
 					sourceNode.getNodeId(), timestamp);
 			client.sendMsg(msg);
@@ -62,7 +55,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	public void csLeave() {
 		// Send release message to all the nodes in the quorum set
 		for (Node node : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.RELEASE, node.getPort());
+			Message msg = new Message(sourceNode.getNodeId(), node.getNodeId(), MessageType.RELEASE);
 			logger.debug("Sending release message to nodeId:{} from nodeId:{}", node.getNodeId(),
 					sourceNode.getNodeId());
 			client.sendMsg(msg);
@@ -89,8 +82,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 				logger.debug(
 						"Received failed message from at least 1 quorum member in nodeId:{} . So, sending yield message to quorum nodeId:{}",
 						sourceNode.getNodeId(), nodeId);
-				client.sendMsg(
-						new Message(sourceNode.getNodeId(), nodeId, MessageType.YIELD, nodeIdVsPort.get(nodeId)));
+				client.sendMsg(new Message(sourceNode.getNodeId(), nodeId, MessageType.YIELD));
 				grantSet.remove(nodeId);
 				failedSet.add(nodeId);
 			}

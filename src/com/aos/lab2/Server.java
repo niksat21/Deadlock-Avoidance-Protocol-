@@ -56,7 +56,7 @@ public class Server implements Runnable {
 		AssociationHandler assocHandler = new AssociationHandler();
 		try {
 			while (true) {
-				logger.debug("Listening for connection on hostname:{} port:{}");
+				
 				SctpChannel sc = ssc.accept();
 				ServerWorker worker = new ServerWorker(nodeId, sc, client, labelValue, config, assocHandler,
 						quorumRequestHandler, csHandler);

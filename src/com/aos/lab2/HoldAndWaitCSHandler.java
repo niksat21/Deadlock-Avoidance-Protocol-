@@ -49,12 +49,12 @@ public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 
 	@Override
 	public void csLeave() {
-		Node[] nodes = new Node[quorumSet.size()];
+		Integer[] nodes = new Integer[quorumSet.size()];
 		quorumSet.toArray(nodes);
 		for (int i = nodes.length - 1; i >= 0; i--) {
-			logger.debug("Sending release message to nodeId:{} from nodeId:{}", nodes[i].getNodeId(),
+			logger.debug("Sending release message to nodeId:{} from nodeId:{}", nodes[i],
 					sourceNode.getNodeId());
-			client.sendMsg(new Message(sourceNode.getNodeId(), nodes[i].getNodeId(), MessageType.RELEASE));
+			client.sendMsg(new Message(sourceNode.getNodeId(), nodes[i], MessageType.RELEASE));
 		}
 	}
 

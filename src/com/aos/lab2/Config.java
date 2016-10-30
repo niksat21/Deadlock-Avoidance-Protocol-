@@ -13,21 +13,21 @@ public class Config {
 	private int waitTime;
 	private int noOfAttempts;
 	private List<Node> nodes = new LinkedList<Node>();
-	private Map<Integer, Set<Integer>> nodeIdVsQuorum = new HashMap<Integer, Set<Integer>>();
+	private Map<Integer, Set<Node>> nodeIdVsQuorum = new HashMap<Integer, Set<Node>>();
 	private Map<Integer, Node> nodeIdVsNodes = new HashMap<Integer, Node>();
 
 
 	private String version=null;
 
 	public Config(int noOfNodes, int csExecTime, int waitTime, int noOfAttempts, List<Node> nodes,
-			Map<Integer, Set<Integer>> nodeIdVsPath) {
+			Map<Integer, Set<Node>> nodeIdVsQuorum) {
 		super();
 		this.noOfNodes = noOfNodes;
 		this.csExecTime = csExecTime;
 		this.waitTime = waitTime;
 		this.noOfAttempts = noOfAttempts;
 		this.nodes = nodes;
-		this.nodeIdVsQuorum = nodeIdVsPath;
+		this.nodeIdVsQuorum = nodeIdVsQuorum;
 		populateNodeIdVsNodesMap();
 	}
 
@@ -57,7 +57,7 @@ public class Config {
 		return nodes;
 	}
 
-	public Set<Integer> getNodeQuorumById(Integer id) {
+	public Set<Node> getNodeQuorumById(Integer id) {
 		return nodeIdVsQuorum.get(id);
 	}
 

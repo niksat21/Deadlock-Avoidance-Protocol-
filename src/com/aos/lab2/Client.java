@@ -99,8 +99,8 @@ public class Client implements Runnable {
 			logger.debug("Sleeping for 8 seconds until other nodes come up");
 			Thread.sleep(8000);
 			createSockets(config.getNodes());
-            if(config.getNodeQuorumById().size()!=0){
-                RequestingCandidate rc = new RequestingCandidate(config);
+            if(config.getNodeQuorumById(nodeId).size()!=0){
+                RequestingCandidate rc = new RequestingCandidate(config,nodeId,this);
                 rc.requestCS();
             }
 			//initiateMsg();
@@ -159,22 +159,22 @@ public class Client implements Runnable {
 	}
 	}
 
-	private void initiateMsg() {
-		for (Node node : config.getNodes()) {
-			if (node.getNodeId().equals(nodeId)) {
-				List<Integer> path = config.getNodePathById(node.getNodeId());
-				if (path != null && !path.isEmpty()) {
-					Node dest = config.getNodeById(path.remove(0));
-					Message msg = new Message(node.getNodeId(), dest.getNodeId(), dest.getPort(), path, labelValue,
-							MessageType.DATA);
-					sendMsg(msg);
-				} else {
-					logger.warn("No message to initiate from nodeId:" + node.getNodeId());
-				}
-				break;
-			}
-		}
-	}
+//	private void initiateMsg() {
+//		for (Node node : config.getNodes()) {
+//			if (node.getNodeId().equals(nodeId)) {
+//				List<Integer> path = config.getNodePathById(node.getNodeId());
+//				if (path != null && !path.isEmpty()) {
+//					Node dest = config.getNodeById(path.remove(0));
+//					Message msg = new Message(node.getNodeId(), dest.getNodeId(), dest.getPort(), path, labelValue,
+//							MessageType.DATA);
+//					sendMsg(msg);
+//				} else {
+//					logger.warn("No message to initiate from nodeId:" + node.getNodeId());
+//				}
+//				break;
+//			}
+//		}
+//	}
 
 	public void broadcastCompletionMsg() {
 		logger.debug("Broadcasting completion message from host:{}", nodeHostname);

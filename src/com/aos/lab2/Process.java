@@ -12,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 public class Process {
 
 	private static Logger logger = LogManager.getLogger(Process.class);
-//	private static Random rand = new Random();
-//	private static int labelValue = rand.nextInt(9) + 1;
+	private static Random rand = new Random();
+	private static int labelValue = rand.nextInt(9) + 1;
 	private static Integer nodeId;
     //private String version = "preemptive";
 
@@ -72,14 +72,7 @@ public class Process {
 		return null;
 	}
 
-	private static int getExpoRandom(int mean){
+	
 
-        double temp = Math.random();
-        double exp = -(Math.log(temp)*mean);
-
-        return (int)exp;
-
-	}
-}
 
 }

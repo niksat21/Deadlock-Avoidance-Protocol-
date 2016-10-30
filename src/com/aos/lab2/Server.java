@@ -22,14 +22,16 @@ public class Server implements Runnable {
 	private Integer labelValue;
 	private Config config;
 	private IQuorumRequestHandler quorumRequestHandler;
+	private ICriticalSectionHandler csHandler;
 
 	public Server(Integer nodeId, Integer labelValue, Integer port, Config config,
-			IQuorumRequestHandler quorumRequestHandler) {
+			IQuorumRequestHandler quorumRequestHandler, ICriticalSectionHandler csHandler) {
 		this.nodeId = nodeId;
 		this.labelValue = labelValue;
 		this.port = port;
 		this.config = config;
 		this.quorumRequestHandler = quorumRequestHandler;
+		this.csHandler = csHandler;
 	}
 
 	@Override
@@ -44,6 +46,7 @@ public class Server implements Runnable {
 	public void setClientHandler(Client client) {
 		this.client = client;
 		quorumRequestHandler.setClientHandler(client);
+		csHandler.setClientHandler(client);
 	}
 
 	private void listenForConnections() throws Exception {
@@ -56,7 +59,7 @@ public class Server implements Runnable {
 				logger.debug("Listening for connection on hostname:{} port:{}");
 				SctpChannel sc = ssc.accept();
 				ServerWorker worker = new ServerWorker(nodeId, sc, client, labelValue, config, assocHandler,
-						quorumRequestHandler);
+						quorumRequestHandler, csHandler);
 				logger.debug("Created server worker");
 				Thread workerThread = new Thread(worker);
 				logger.debug("Created server worker thread");

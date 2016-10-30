@@ -34,15 +34,18 @@ public class Process {
 			Node node = config.getNodeById(nodeId);
 
 			IQuorumRequestHandler quroumRequestHandler = null;
+			ICriticalSectionHandler csHandler = null;
 			if (config.getVersion().equals(DeadlockResolverType.HOLD_AND_WAIT)) {
 				quroumRequestHandler = new HoldAndWaitQuorumRequestHandler(node, config);
+				csHandler = new HoldAndWaitCSHandler(config, node, config.getNodeQuorumById(node.getNodeId()));
 			} else if (config.getVersion().equals(DeadlockResolverType.PREEMPTIVE)) {
 				quroumRequestHandler = new PreemptiveQuorumRequestHandler(node, config);
+				csHandler = new PreemptiveCSHandler(config, node, config.getNodeQuorumById(nodeId));
 			} else {
 				logger.error("Unsupported config version: {}", config.getVersion().toString());
 			}
 
-			Server server = new Server(nodeId, labelValue, node.getPort(), config, quroumRequestHandler);
+			Server server = new Server(nodeId, labelValue, node.getPort(), config, quroumRequestHandler, csHandler);
 			Client client = new Client(hostname, labelValue, config, nodeId);
 			server.setClientHandler(client);
 
@@ -55,7 +58,7 @@ public class Process {
 			Thread.sleep(10000);
 
 			if (config.getNodeQuorumById(nodeId).size() != 0) {
-				RequestingCandidate rc = new RequestingCandidate(config, nodeId, client);
+				RequestingCandidate rc = new RequestingCandidate(config, nodeId, client, csHandler);
 				rc.requestCS();
 			}
 

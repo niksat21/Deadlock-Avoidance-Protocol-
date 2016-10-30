@@ -37,8 +37,6 @@ public class Client implements Runnable {
 	private void createSockets(List<Node> nodes) {
 		for (Node node : nodes) {
 			try {
-				if (node.getNodeId().equals(nodeId))
-					continue;
 				logger.debug("Trying to create connection with host:{} port:{}", node.getHostname(), node.getPort());
 				SocketAddress socketAddress = new InetSocketAddress(node.getHostname(), node.getPort());
 				nodeVsSocket.put(node.getNodeId(), socketAddress);
@@ -77,7 +75,7 @@ public class Client implements Runnable {
 
 	public void sendMsg(Message msg) {
 		SocketAddress socketAddress = nodeVsSocket.get(msg.getDestination());
-		logger.debug("Destination socket here is:{} ::{}",msg.getDestination(),socketAddress);
+		logger.debug("Destination socket here is:{} ::{}", msg.getDestination(), socketAddress);
 		while (true) {
 			try {
 				SctpChannel sctpChannel = SctpChannel.open();
@@ -100,7 +98,7 @@ public class Client implements Runnable {
 				logger.warn("Exception in Send()" + e);
 				e.printStackTrace();
 			}
-	
+
 		}
 	}
 

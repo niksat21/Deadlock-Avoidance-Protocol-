@@ -27,9 +27,11 @@ public class ServerWorker implements Runnable {
 	private Config config;
 	private AssociationHandler assocHandler;
 	private IQuorumRequestHandler quorumRequestHandler;
+	private ICriticalSectionHandler csHandler;
 
 	public ServerWorker(Integer nodeId, SctpChannel sc, Client client, Integer labelValue, Config config,
-			AssociationHandler assocHandler, IQuorumRequestHandler quorumRequestHandler) {
+			AssociationHandler assocHandler, IQuorumRequestHandler quorumRequestHandler,
+			ICriticalSectionHandler csHandler) {
 		this.sc = sc;
 		this.nodeId = nodeId;
 		this.client = client;
@@ -37,6 +39,7 @@ public class ServerWorker implements Runnable {
 		this.config = config;
 		this.assocHandler = assocHandler;
 		this.quorumRequestHandler = quorumRequestHandler;
+		this.csHandler = csHandler;
 	}
 
 	@Override
@@ -64,6 +67,12 @@ public class ServerWorker implements Runnable {
 					quorumRequestHandler.handleReleaseMessage(msg.getSource());
 				} else if (msg.getMsgType().equals(MessageType.YIELD)) {
 					quorumRequestHandler.handleReleaseMessage(msg.getSource());
+				} else if (msg.getMsgType().equals(MessageType.GRANT)) {
+					csHandler.handleGrantMessage(msg.getSource());
+				} else if (msg.getMsgType().equals(MessageType.FAILED)) {
+					csHandler.handleFailedMessage(msg.getSource());
+				} else if (msg.getMsgType().equals(MessageType.INQUIRE)) {
+					csHandler.handleInquireMessage(msg.getSource());
 				} else {
 					logger.error("Unsupported message type : {} by the quorum handler", msg.getMsgType().toString());
 				}

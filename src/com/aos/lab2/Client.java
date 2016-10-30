@@ -28,6 +28,7 @@ public class Client implements Runnable {
 		this.labelValue = labelValue;
 		this.config = config;
 		this.nodeId = nodeId;
+
 	}
 
 	// Open connections with every other node
@@ -70,7 +71,11 @@ public class Client implements Runnable {
 			logger.debug("Sleeping for 8 seconds until other nodes come up");
 			Thread.sleep(8000);
 			createSockets(config.getNodes());
-			initiateMsg();
+            if(config.getNodeQuorumById().size()!=0){
+                RequestingCandidate rc = new RequestingCandidate(config);
+                rc.requestCS();
+            }
+			//initiateMsg();
 
 		} catch (Exception e) {
 			logger.error("Problem in client thread.", e);

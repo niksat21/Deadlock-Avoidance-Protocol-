@@ -18,11 +18,10 @@ public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 	private Integer requestedNodeId = null;
 	private volatile boolean waitingForReply = false;
 
-	public HoldAndWaitCSHandler(Config config, Node sourceNode, Client client, Set<Integer> quorumSet) {
+	public HoldAndWaitCSHandler(Config config, Node sourceNode, Set<Integer> quorumSet) {
 		super();
 		this.config = config;
 		this.sourceNode = sourceNode;
-		this.client = client;
 		this.quorumSet = quorumSet;
 	}
 
@@ -63,6 +62,22 @@ public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 		logger.debug("Received grant message by nodeId:{} from quorum nodeId:{}", sourceNode.getNodeId(), nodeId);
 		waitingForReply = false;
 		requestedNodeId = null;
+	}
+
+	@Override
+	public void handleFailedMessage(Integer nodeId) {
+		logger.error("Unimplemented method handleFailedMessage in HoldAndWaitCS Handler");
+
+	}
+
+	@Override
+	public void handleInquireMessage(Integer nodeId) {
+		logger.error("Unimplemented method handleInquireMessage in HoldAndWaitCS Handler");
+	}
+
+	@Override
+	public void setClientHandler(Client client) {
+		this.client = client;
 	}
 
 }

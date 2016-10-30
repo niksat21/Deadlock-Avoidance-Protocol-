@@ -19,11 +19,10 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	private Client client;
 	private boolean isInsideCS = false;
 
-	public PreemptiveCSHandler(Config config, Node sourceNode, Client client, Set<Integer> quorumSet) {
+	public PreemptiveCSHandler(Config config, Node sourceNode, Set<Integer> quorumSet) {
 		super();
 		this.config = config;
 		this.sourceNode = sourceNode;
-		this.client = client;
 		this.quorumSet = quorumSet;
 		this.grantSet = new HashSet<Integer>();
 		this.failedSet = new HashSet<Integer>();
@@ -96,6 +95,11 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		}
 		grantSet.add(nodeId);
 		failedSet.remove(nodeId);
+	}
+
+	@Override
+	public void setClientHandler(Client client) {
+		this.client = client;
 	}
 
 }

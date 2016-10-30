@@ -37,8 +37,6 @@ public class Client implements Runnable {
 	private void createSockets(List<Node> nodes) {
 		for (Node node : nodes) {
 			try {
-				if (node.getNodeId().equals(nodeId))
-					continue;
 				logger.debug("Trying to create connection with host:{} port:{}", node.getHostname(), node.getPort());
 				SocketAddress socketAddress = new InetSocketAddress(node.getHostname(), node.getPort());
 				nodeVsSocket.put(node.getNodeId(), socketAddress);

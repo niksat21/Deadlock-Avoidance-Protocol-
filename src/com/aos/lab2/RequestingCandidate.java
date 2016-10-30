@@ -16,6 +16,7 @@ public class RequestingCandidate {
 		this.config = config;
 		this.nodeId = nodeId;
 		this.client = client;
+		this.csHandler = csHandler;
 	}
 
 	public void requestCS() throws InterruptedException {

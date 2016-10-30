@@ -7,9 +7,9 @@ import java.util.PriorityQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class QuorumRequestHandler {
+public class PreemptiveQuorumRequestHandler {
 
-	private static final Logger logger = LogManager.getLogger(QuorumRequestHandler.class);
+	private static final Logger logger = LogManager.getLogger(PreemptiveQuorumRequestHandler.class);
 
 	private RequestTSComparator requestComparator = new RequestTSComparator();
 	private PriorityQueue<CSRequest> queue;
@@ -22,7 +22,7 @@ public class QuorumRequestHandler {
 	private boolean hasGranted = false;
 	private CSRequest grantedRequest = null;
 
-	public QuorumRequestHandler(Node quorumNode, Client client, Config config) {
+	public PreemptiveQuorumRequestHandler(Node quorumNode, Client client, Config config) {
 		super();
 		this.quorumNode = quorumNode;
 		this.queue = new PriorityQueue<CSRequest>(requestComparator);
@@ -115,12 +115,12 @@ public class QuorumRequestHandler {
 		client.sendMsg(msg);
 	}
 
-	private Message sendGrantMessage(CSRequest request) {
+	private void sendGrantMessage(CSRequest request) {
 		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.GRANT,
 				nodeIdVsPort.get(request.getNodeId()));
 		logger.info("Sending grant message to the requesting nodeId:{} from the quorum nodeId:{} .Request TS:{}",
 				request.getNodeId(), quorumNode.getNodeId(), request.getTimestamp());
-		return msg;
+		client.sendMsg(msg);
 	}
 
 	private void sendFailedMessage(CSRequest request) {

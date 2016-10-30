@@ -12,9 +12,10 @@ import org.apache.logging.log4j.Logger;
 public class Process {
 
 	private static Logger logger = LogManager.getLogger(Process.class);
-	private static Random rand = new Random();
-	private static int labelValue = rand.nextInt(9) + 1;
+//	private static Random rand = new Random();
+//	private static int labelValue = rand.nextInt(9) + 1;
 	private static Integer nodeId;
+    //private String version = "preemptive";
 
 	public Process() {
 
@@ -24,6 +25,7 @@ public class Process {
 		try {
 			ConfigParser parser = new ConfigParser();
 			Config config = parser.getConfig();
+            config.setVersion(args[0]);
 			String hostname = InetAddress.getLocalHost().getHostName();
 			nodeId = Integer.valueOf(System.getProperty("nodeId"));
 			logger.info("Hostname:{} NodeId:{} Label value:{}", hostname, nodeId, labelValue);
@@ -35,31 +37,31 @@ public class Process {
 			Thread serverThread = new Thread(server, "server-thread");
 
 			clientThread.start();
-			serverThread.start();
+            serverThread.start();
 
-			while (true) {
-				if (ServerWorker.isCompleted()) {
-					serverThread.interrupt();
-					Thread.sleep(2000);
-					writeOutputToFile(hostname);
-					System.exit(0);
-					break;
-				}
-				Thread.sleep(3000);
-			}
-
+//			while (true) {
+//				if (ServerWorker.isCompleted()) {
+//					serverThread.interrupt();
+//					Thread.sleep(2000);
+//					writeOutputToFile(hostname);
+//					System.exit(0);
+//					break;
+//				}
+//				Thread.sleep(3000);
+//			}
+//
 		} catch (Exception e) {
 			logger.error("Exception in Process", e);
 		}
 
 	}
 
-	private static void writeOutputToFile(String hostname) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(hostname + "_" + nodeId + ".txt"));
-		writer.write("Label value: " + labelValue);
-		writer.write("\nOutput value: " + ServerWorker.getResult());
-		writer.close();
-	}
+//	private static void writeOutputToFile(String hostname) throws IOException {
+//		BufferedWriter writer = new BufferedWriter(new FileWriter(hostname + "_" + nodeId + ".txt"));
+//		writer.write("Label value: " + labelValue);
+//		writer.write("\nOutput value: " + ServerWorker.getResult());
+//		writer.close();
+//	}
 
 	private static Integer getNodeId(String hostname, Config config) {
 		for (Node node : config.getNodes()) {
@@ -69,5 +71,15 @@ public class Process {
 		logger.error("Unable to find nodeId for hostname: {} in the list", hostname);
 		return null;
 	}
+
+	private static int getExpoRandom(int mean){
+
+        double temp = Math.random();
+        double exp = -(Math.log(temp)*mean);
+
+        return (int)exp;
+
+	}
+}
 
 }

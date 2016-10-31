@@ -90,6 +90,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 			// Send grant message to the next request
 			CSRequest request = queue.peek();
 			sendGrantMessage(request);
+			hasGranted = true;
 		} else {
 			hasGranted = false;
 			grantedRequest = null;

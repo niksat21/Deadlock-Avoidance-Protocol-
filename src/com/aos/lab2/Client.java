@@ -75,8 +75,8 @@ public class Client implements Runnable {
 
 	public void sendMsg(Message msg) {
 		SocketAddress socketAddress = nodeVsSocket.get(msg.getDestination());
-		
-		logger.debug("Destination socket here is:{} ::{}",msg.getDestination(),socketAddress);
+
+		logger.debug("Destination socket here is:{} ::{}", msg.getDestination(), socketAddress);
 		while (true) {
 			try {
 				SctpChannel sctpChannel = SctpChannel.open();
@@ -105,7 +105,7 @@ public class Client implements Runnable {
 					e1.printStackTrace();
 				}
 			}
-	
+
 		}
 	}
 

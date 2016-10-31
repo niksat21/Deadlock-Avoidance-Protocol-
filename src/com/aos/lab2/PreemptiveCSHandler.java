@@ -18,6 +18,8 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	private Node sourceNode;
 	private Client client;
 	private boolean isInsideCS = false;
+	private boolean wasInquired = false;
+	private Integer inquiredBy = null;
 
 	public PreemptiveCSHandler(Config config, Node sourceNode, Set<Integer> quorumSet) {
 		super();
@@ -32,7 +34,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	public void csEnter(Long timestamp) throws InterruptedException {
 		// Send request message to all the nodes in the quorum set
 		for (Integer nodeId : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), nodeId, MessageType.REQUEST);
+			Message msg = new Message(sourceNode.getNodeId(), nodeId, MessageType.REQUEST,timestamp);
 			logger.debug("Sending request message to nodeId:{} from nodeId:{}", nodeId, sourceNode.getNodeId(),
 					timestamp);
 			client.sendMsg(msg);
@@ -69,6 +71,12 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 					sourceNode.getNodeId(), nodeId);
 		}
 		failedSet.add(nodeId);
+		
+		if(wasInquired && inquiredBy != null) {
+			sendYieldMessage(nodeId);
+			wasInquired = false;
+			inquiredBy = null;
+		}
 	}
 
 	public synchronized void handleInquireMessage(Integer nodeId) {
@@ -80,11 +88,18 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 				logger.debug(
 						"Received failed message from at least 1 quorum member in nodeId:{} . So, sending yield message to quorum nodeId:{}",
 						sourceNode.getNodeId(), nodeId);
-				client.sendMsg(new Message(sourceNode.getNodeId(), nodeId, MessageType.YIELD));
-				grantSet.remove(nodeId);
-				failedSet.add(nodeId);
+				sendYieldMessage(nodeId);
+			} else {
+				wasInquired = true;
+				inquiredBy = nodeId;
 			}
 		}
+	}
+
+	private void sendYieldMessage(Integer nodeId) {
+		client.sendMsg(new Message(sourceNode.getNodeId(), nodeId, MessageType.YIELD));
+		grantSet.remove(nodeId);
+		failedSet.add(nodeId);
 	}
 
 	public synchronized void handleGrantMessage(Integer nodeId) {

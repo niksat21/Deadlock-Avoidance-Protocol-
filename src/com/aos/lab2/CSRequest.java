@@ -37,5 +37,10 @@ public class CSRequest implements Comparable<CSRequest> {
 				return 1;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "NodeId:" + nodeId + " TS:" + timestamp;
+ 	}
 
 }

@@ -73,7 +73,7 @@ public class ServerWorker implements Runnable {
 				} else if (msg.getMsgType().equals(MessageType.RELEASE)) {
 					quorumRequestHandler.handleReleaseMessage(msg.getSource());
 				} else if (msg.getMsgType().equals(MessageType.YIELD)) {
-					quorumRequestHandler.handleReleaseMessage(msg.getSource());
+					quorumRequestHandler.handleYieldMessage(msg.getSource());
 				} else if (msg.getMsgType().equals(MessageType.GRANT)) {
 					csHandler.handleGrantMessage(msg.getSource());
 				} else if (msg.getMsgType().equals(MessageType.FAILED)) {

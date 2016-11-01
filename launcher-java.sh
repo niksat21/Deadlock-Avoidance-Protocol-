@@ -6,7 +6,7 @@ netid=axr140930
 
 
 # Root directory of your project
-PROJDIR=/home/012/k/kx/axr140930/com.aos.lab1
+PROJDIR=/home/010/a/ax/axr140930/AOS_Project2/com.aos.lab2
 
 CONFIG=$PROJDIR/conf/config.txt
 
@@ -18,7 +18,7 @@ BINDIR=$PROJDIR/bin
 #
 # Your main project class
 #
-PROG=com.aos.lab1.Process
+PROG=com.aos.lab2.Process
 
 
 cat $CONFIG | sed -e "s/#.*//" | sed -e "/^\s*$/d" | grep "\s*[0-9]\+\s*\w\+.*" |
@@ -31,7 +31,7 @@ cat $CONFIG | sed -e "s/#.*//" | sed -e "/^\s*$/d" | grep "\s*[0-9]\+\s*\w\+.*" 
 	n=$( echo $line | awk '{ print $1 }' )
 	host=$( echo $line | awk '{ print $2 }' )
 	nodeId=$( echo $line | awk '{ print $1 }' )
-    ssh -o StrictHostKeyChecking=no $netid@$host java -cp $BINDIR:$PROJDIR/lib/* -Dconfig=$CONFIG -Dlog4j.configurationFile=/home/012/k/kx/kxm153630/com.aos.lab1/conf/log4j.xml -DnodeId=$nodeId $PROG $n &
+    ssh -o StrictHostKeyChecking=no $netid@$host java -cp $BINDIR:$PROJDIR/lib/* -Dconfig=$CONFIG -Dlog4j.configurationFile=$PROG/conf/log4j.xml -DnodeId=$nodeId $PROG $n &
 	((count++))
 	if["$noOfNodes" -eq "$count"];
 	then

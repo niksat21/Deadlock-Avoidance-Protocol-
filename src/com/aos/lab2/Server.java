@@ -23,6 +23,7 @@ public class Server implements Runnable {
 	private Config config;
 	private IQuorumRequestHandler quorumRequestHandler;
 	private ICriticalSectionHandler csHandler;
+	private SctpChannel sc;
 
 	public Server(Integer nodeId, Integer labelValue, Integer port, Config config,
 			IQuorumRequestHandler quorumRequestHandler, ICriticalSectionHandler csHandler) {
@@ -57,15 +58,16 @@ public class Server implements Runnable {
 		try {
 			while (true) {
 				
-				SctpChannel sc = ssc.accept();
+				sc = ssc.accept();
 				ServerWorker worker = new ServerWorker(nodeId, sc, client, labelValue, config, assocHandler,
-						quorumRequestHandler, csHandler);
+						quorumRequestHandler, csHandler, ssc);
 				logger.debug("Created server worker");
 				Thread workerThread = new Thread(worker);
 				logger.debug("Created server worker thread");
 				workerThread.start();
 			}
 		} finally {
+			sc.close();
 			ssc.close();
 		}
 	}

@@ -37,6 +37,9 @@ public class RequestingCandidate {
 			csHandler.csLeave();
 			logger.info("Critical Section: Leave NodeId:{}", node.getNodeId());
 			count++;
+			//start broadcasting complete message
+			ServerWorker.isCompleted = true;
+			client.broadcastCompletionMsg();
 		}
 
 	}

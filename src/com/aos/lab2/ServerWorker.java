@@ -19,7 +19,7 @@ public class ServerWorker implements Runnable {
 	private volatile static Set<Integer> completedSet = new HashSet<Integer>();
 	public volatile static Boolean isCompleted = Boolean.FALSE;
 	private volatile static int result = -1;
-	private volatile static Integer completeMessageCount;
+	private volatile static int completeMessageCount=0;
 	private volatile static Integer noOfNodes;
 
 	private Logger logger = LogManager.getLogger(ServerWorker.class);
@@ -44,9 +44,8 @@ public class ServerWorker implements Runnable {
 		this.assocHandler = assocHandler;
 		this.quorumRequestHandler = quorumRequestHandler;
 		this.csHandler = csHandler;
-		this.completeMessageCount = 0;
-		this.noOfNodes = config.getNoOfNodes();
 		this.ssc = ssc;
+		noOfNodes= config.getNoOfNodes();
 	}
 
 	@Override
@@ -110,7 +109,7 @@ public class ServerWorker implements Runnable {
 			completeMessageCount++;
 			logger.error("Received at:{} and the counter now is:{}", src, completeMessageCount);
 			logger.error("isCompletedisCompletedisCompletedisCompleted:{}", isCompleted);
-			if ((completeMessageCount.intValue() + 1 == noOfNodes.intValue()) && isCompleted) {
+			if ((completeMessageCount + 1 == noOfNodes) && isCompleted) {
 				shutdown();
 				logger.error("EXIT!!!!!!!!!!!!!!");
 				System.exit(0);

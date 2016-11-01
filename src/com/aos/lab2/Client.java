@@ -111,7 +111,9 @@ public class Client implements Runnable {
 
 	public void broadcastCompletionMsg() {
 		logger.debug("Broadcasting completion message from host:{}", nodeHostname);
-		for (Node node : config.getNodes()) {
+		List<Node> nodeList = config.getNodes();
+		logger.error("NodesList Contentes!!! {}", nodeList.toString());
+		for (Node node : nodeList) {
 			// Ignore sending the completion message to itself
 			if (node.getNodeId().equals(nodeId))
 				continue;

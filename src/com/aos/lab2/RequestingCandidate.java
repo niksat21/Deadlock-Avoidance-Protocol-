@@ -39,7 +39,7 @@ public class RequestingCandidate {
 			count++;
 		}
 		//start broadcasting complete message
-		ServerWorker.isCompleted = true;
+		ServerWorker.isCompleted = Boolean.TRUE;
 		client.broadcastCompletionMsg();
 	}
 

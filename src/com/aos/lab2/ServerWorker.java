@@ -17,7 +17,7 @@ import com.sun.nio.sctp.SctpChannel;
 public class ServerWorker implements Runnable {
 
 	private volatile static Set<Integer> completedSet = new HashSet<Integer>();
-	public volatile static Boolean isCompleted = false;
+	public volatile static Boolean isCompleted = Boolean.FALSE;
 	private volatile static int result = -1;
 	private volatile static Integer completeMessageCount;
 	private volatile static Integer noOfNodes;
@@ -105,11 +105,16 @@ public class ServerWorker implements Runnable {
 		System.out.println(json);
 	}
 	
-		public synchronized void handleCompleteMessage(Integer src) {
+		public void handleCompleteMessage(Integer src) {
+			synchronized(ServerWorker.class) {
 			completeMessageCount++;
-			if (completeMessageCount == noOfNodes && isCompleted) {
+			logger.error("Received at:{} and the counter now is:{}", src, completeMessageCount);
+			logger.error("isCompletedisCompletedisCompletedisCompleted:{}", isCompleted);
+			if ((completeMessageCount.intValue() + 1 == noOfNodes.intValue()) && isCompleted) {
 				shutdown();
+				logger.error("EXIT!!!!!!!!!!!!!!");
 				System.exit(0);
+			}
 			}
 		}
 	

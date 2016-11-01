@@ -116,7 +116,9 @@ public class Client implements Runnable {
 			if (node.getNodeId().equals(nodeId))
 				continue;
 			Message msg = new Message(nodeId, node.getNodeId(), null, 0, MessageType.COMPLETED);
+			logger.error("Before SENDING BROADCAST! from {}", nodeId);
 			sendMsg(msg);
+			logger.error("After SENDING BROADCAST! from: {} to: {}", nodeId, msg.getDestination());
 		}
 
 	}

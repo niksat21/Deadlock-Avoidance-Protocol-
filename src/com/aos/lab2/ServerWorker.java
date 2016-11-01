@@ -12,15 +12,12 @@ import org.apache.logging.log4j.Logger;
 import com.aos.lab2.Server.AssociationHandler;
 import com.sun.nio.sctp.MessageInfo;
 import com.sun.nio.sctp.SctpChannel;
-import com.sun.nio.sctp.SctpServerChannel;
 
 public class ServerWorker implements Runnable {
 
 	private volatile static Set<Integer> completedSet = new HashSet<Integer>();
-	public volatile static Boolean isCompleted = false;
+	private volatile static Boolean isCompleted = false;
 	private volatile static int result = -1;
-	private volatile static Integer completeMessageCount;
-	private volatile static Integer noOfNodes;
 
 	private Logger logger = LogManager.getLogger(ServerWorker.class);
 	private SctpChannel sc;
@@ -31,11 +28,10 @@ public class ServerWorker implements Runnable {
 	private AssociationHandler assocHandler;
 	private IQuorumRequestHandler quorumRequestHandler;
 	private ICriticalSectionHandler csHandler;
-	private SctpServerChannel ssc;
 
 	public ServerWorker(Integer nodeId, SctpChannel sc, Client client, Integer labelValue, Config config,
 			AssociationHandler assocHandler, IQuorumRequestHandler quorumRequestHandler,
-			ICriticalSectionHandler csHandler, SctpServerChannel ssc) {
+			ICriticalSectionHandler csHandler) {
 		this.sc = sc;
 		this.nodeId = nodeId;
 		this.client = client;
@@ -44,9 +40,6 @@ public class ServerWorker implements Runnable {
 		this.assocHandler = assocHandler;
 		this.quorumRequestHandler = quorumRequestHandler;
 		this.csHandler = csHandler;
-		this.completeMessageCount = 0;
-		this.noOfNodes = config.getNoOfNodes();
-		this.ssc = ssc;
 	}
 
 	@Override
@@ -55,7 +48,7 @@ public class ServerWorker implements Runnable {
 			// Sleep for sometime so that the other nodes come up.
 			Thread.sleep(8000);
 
-			while (true) {
+			while (true /* && !isCompleted */) {
 				ByteBuffer buf = ByteBuffer.allocateDirect(500000);
 				MessageInfo messageInfo = sc.receive(buf, System.out, assocHandler);
 				buf.flip();
@@ -80,8 +73,6 @@ public class ServerWorker implements Runnable {
 					csHandler.handleFailedMessage(msg.getSource());
 				} else if (msg.getMsgType().equals(MessageType.INQUIRE)) {
 					csHandler.handleInquireMessage(msg.getSource());
-//				} else if (msg.getMsgType().equals(MessageType.COMPLETED)) {
-//					handleCompleteMessage(msg.getSource());
 				} else {
 					logger.error("Unsupported message type : {} by the quorum handler", msg.getMsgType().toString());
 				}
@@ -104,21 +95,4 @@ public class ServerWorker implements Runnable {
 		json = json.substring(1);
 		System.out.println(json);
 	}
-
-//	public synchronized void handleCompleteMessage(Integer src) {
-//		completeMessageCount++;
-//		if (completeMessageCount == noOfNodes && isCompleted) {
-//			shutdown();
-//			System.exit(0);
-//		}
-//	}
-
-//	public void shutdown() {
-//		try {
-//			sc.close();
-//			ssc.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
 }

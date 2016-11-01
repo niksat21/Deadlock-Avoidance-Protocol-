@@ -25,22 +25,18 @@ public class RequestingCandidate {
 		Node node = config.getNodeById(nodeId);
 		// sleep for some random time before making request for CS
 		Thread.sleep(getExpoRandom(config.getWaitTime()));
-
-		while (count <= noOfRequests) {
+		
+		while (count < noOfRequests) {
 			csHandler.csEnter(System.currentTimeMillis());
 			logger.info("Critical Section: Enter NodeId:{}", node.getNodeId());
-			logger.debug("noOfRequests :{} count:{} ", noOfRequests, count);
-
+			logger.debug("noOfRequests :{} count:{} ",noOfRequests,count);
+			
 			// sleep till CS is executed
 			Thread.sleep(getExpoRandom(config.getCsExecTime()));
 			csHandler.csLeave();
 			logger.info("Critical Section: Leave NodeId:{}", node.getNodeId());
 			count++;
 		}
-
-		// start broadcasting complete message
-		// ServerWorker.isCompleted = true;
-		// client.broadcastCompletionMsg();
 
 	}
 

@@ -28,6 +28,8 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 
 	public synchronized void handleRequestMessage(CSRequest request) {
 		CSRequest previousReq = queue.peek();
+		
+		logger.debug("Received request message from nodeId:{} with TS:{} in quorum nodeId:{}", request.getNodeId(), request.getTimestamp(), quorumNode.getNodeId());
 
 		// Add request to the queue
 		queue.add(request);
@@ -48,7 +50,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 			// granted first.
 			sendFailedMessage(request);
 		}
-
+		logger.debug("Request Queue: {} in nodeId:{}", queue, quorumNode.getNodeId());
 	}
 
 	public synchronized void handleYieldMessage(Integer sourceNodeId) {
@@ -70,6 +72,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 			grantedRequest = request;
 			sendGrantMessage(request);
 		}
+		logger.debug("Request Queue: {} in nodeId:{}", queue, quorumNode.getNodeId());
 	}
 
 	public synchronized void handleReleaseMessage(Integer sourceNode) {
@@ -80,23 +83,23 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 					"Unable to find the request from nodeId:{} with TS:{} in the quorum nodeId:{} when handling release message",
 					grantedRequest.getNodeId(), grantedRequest.getTimestamp(), quorumNode.getNodeId());
 
-		if (grantedRequest.getNodeId() != sourceNode) {
+		if (!grantedRequest.getNodeId().equals(sourceNode)) {
 			logger.error(
 					"The nodeId:{} from which release message is obtained is not same as the nodeId:{} to which request was granted in the quorum nodeId:{}",
-					sourceNode, grantedRequest.getNodeId());
+					sourceNode, grantedRequest.getNodeId(), quorumNode.getNodeId());
 		}
 
 		if (!queue.isEmpty()) {
 			// Send grant message to the next request
 			CSRequest request = queue.peek();
 			sendGrantMessage(request);
-			hasGranted = true;
+			grantedRequest = request;
 		} else {
 			hasGranted = false;
 			grantedRequest = null;
 			logger.debug("No other request to be satisfied from quorum nodeId:{}", quorumNode.getNodeId());
 		}
-
+		logger.debug("Request Queue: {} in nodeId:{}", queue, quorumNode.getNodeId());
 	}
 
 	private void sendInquireMessage(CSRequest request, CSRequest previousReq) {

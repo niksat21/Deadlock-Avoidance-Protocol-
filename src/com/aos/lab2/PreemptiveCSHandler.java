@@ -34,7 +34,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	public void csEnter(Long timestamp) throws InterruptedException {
 		// Send request message to all the nodes in the quorum set
 		for (Integer nodeId : quorumSet) {
-			Message msg = new Message(sourceNode.getNodeId(), nodeId, MessageType.REQUEST,timestamp);
+			Message msg = new Message(sourceNode.getNodeId(), nodeId, MessageType.REQUEST, timestamp);
 			logger.debug("Sending request message to nodeId:{} from nodeId:{}", nodeId, sourceNode.getNodeId(),
 					timestamp);
 			client.sendMsg(msg);
@@ -50,6 +50,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		}
 		isInsideCS = true;
 		logger.debug("Critical Section request granted for NodeId:{}", sourceNode.getNodeId());
+		logger.debug("NodeId:{} GrantSet:{} FailedSet:{}", sourceNode.getNodeId(), grantSet, failedSet);
 	}
 
 	@Override
@@ -61,6 +62,9 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 			client.sendMsg(msg);
 		}
 		isInsideCS = false;
+		grantSet.clear();
+		failedSet.clear();
+		logger.debug("NodeId:{} GrantSet:{} FailedSet:{}", sourceNode.getNodeId(), grantSet, failedSet);
 	}
 
 	public synchronized void handleFailedMessage(Integer nodeId) {
@@ -71,12 +75,13 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 					sourceNode.getNodeId(), nodeId);
 		}
 		failedSet.add(nodeId);
-		
-		if(wasInquired && inquiredBy != null) {
+
+		if (wasInquired && inquiredBy != null) {
 			sendYieldMessage(nodeId);
 			wasInquired = false;
 			inquiredBy = null;
 		}
+		logger.debug("NodeId:{} GrantSet:{} FailedSet:{}", sourceNode.getNodeId(), grantSet, failedSet);
 	}
 
 	public synchronized void handleInquireMessage(Integer nodeId) {
@@ -94,6 +99,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 				inquiredBy = nodeId;
 			}
 		}
+		logger.debug("NodeId:{} GrantSet:{} FailedSet:{}", sourceNode.getNodeId(), grantSet, failedSet);
 	}
 
 	private void sendYieldMessage(Integer nodeId) {
@@ -110,6 +116,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		}
 		grantSet.add(nodeId);
 		failedSet.remove(nodeId);
+		logger.debug("NodeId:{} GrantSet:{} FailedSet:{}", sourceNode.getNodeId(), grantSet, failedSet);
 	}
 
 	@Override

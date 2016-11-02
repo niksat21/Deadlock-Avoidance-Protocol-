@@ -79,5 +79,10 @@ public class HoldAndWaitCSHandler implements ICriticalSectionHandler {
 	public void setClientHandler(Client client) {
 		this.client = client;
 	}
+	
+	
+	public boolean checkSets() {
+		return true;
+	}
 
 }

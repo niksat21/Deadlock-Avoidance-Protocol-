@@ -60,5 +60,14 @@ public class HoldAndWaitQuorumRequestHandler implements IQuorumRequestHandler {
 	public void setClientHandler(Client client) {
 		this.client = client;
 	}
+	
+	
+	public boolean checkRequestingQueue(){
+		if(this.requestQueue.isEmpty())
+			return true;
+		else
+			return false;
+		
+	}
 
 }

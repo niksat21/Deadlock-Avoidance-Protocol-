@@ -11,8 +11,9 @@ public class RequestingCandidate {
 	private Integer nodeId;
 	private Client client;
 	private ICriticalSectionHandler csHandler;
-
-	public RequestingCandidate(Config config, Integer nodeId, Client client, ICriticalSectionHandler csHandler) {
+	private IQuorumRequestHandler quroumRequestHandler;
+	
+	public RequestingCandidate(Config config, Integer nodeId, Client client, ICriticalSectionHandler csHandler, IQuorumRequestHandler quroumRequestHandler) {
 		this.config = config;
 		this.nodeId = nodeId;
 		this.client = client;
@@ -38,9 +39,12 @@ public class RequestingCandidate {
 			logger.info("Critical Section: Leave NodeId:{}", node.getNodeId());
 			count++;
 		}
-		//start broadcasting complete message
-		ServerWorker.isCompleted = Boolean.TRUE;
-		client.broadcastCompletionMsg();
+		//checking if all the queues are empty
+		if(quroumRequestHandler.checkRequestingQueue() && csHandler.checkSets() ){
+			//start broadcasting complete message
+			ServerWorker.isCompleted = Boolean.TRUE;
+			client.broadcastCompletionMsg();
+		}
 	}
 
 	private static int getExpoRandom(int mean) {

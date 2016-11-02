@@ -29,6 +29,10 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		this.grantSet = new HashSet<Integer>();
 		this.failedSet = new HashSet<Integer>();
 	}
+	
+	public PreemptiveCSHandler(Node sourceNode){
+		this.sourceNode = sourceNode;
+	}
 
 	@Override
 	public void csEnter(Long timestamp) throws InterruptedException {
@@ -122,6 +126,14 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	@Override
 	public void setClientHandler(Client client) {
 		this.client = client;
+	}
+
+	
+	public boolean checkSets() {
+		if(this.grantSet.isEmpty() && this.failedSet.isEmpty())
+			return true;
+		else
+			return false;
 	}
 
 }

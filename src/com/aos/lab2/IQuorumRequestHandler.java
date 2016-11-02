@@ -10,4 +10,6 @@ public interface IQuorumRequestHandler {
 
 	public void setClientHandler(Client client);
 
+	public boolean checkRequestingQueue();
+
 }

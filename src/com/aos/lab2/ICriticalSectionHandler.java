@@ -14,4 +14,6 @@ public interface ICriticalSectionHandler {
 
 	public void setClientHandler(Client client);
 
+	public boolean checkSets();
+
 }

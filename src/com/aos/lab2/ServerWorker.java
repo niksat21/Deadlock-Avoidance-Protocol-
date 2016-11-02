@@ -80,7 +80,8 @@ public class ServerWorker implements Runnable {
 				} else if (msg.getMsgType().equals(MessageType.INQUIRE)) {
 					csHandler.handleInquireMessage(msg.getSource());
 				} else if (msg.getMsgType().equals(MessageType.COMPLETED)) {
-					handleCompleteMessage(msg.getSource());
+						handleCompleteMessage(msg.getSource());
+						logger.error("Received COMPLETED at:{} from:{} ", msg.getSource(), msg.getDestination());
 				} else {
 					logger.error("Unsupported message type : {} by the quorum handler", msg.getMsgType().toString());
 				}

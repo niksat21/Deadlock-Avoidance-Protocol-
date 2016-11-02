@@ -128,5 +128,14 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 	public void setClientHandler(Client client) {
 		this.client = client;
 	}
+	
+	
+	public boolean checkRequestingQueue(){
+		if(this.queue.isEmpty())
+			return true;
+		else
+			return false;
+		
+	}
 
 }

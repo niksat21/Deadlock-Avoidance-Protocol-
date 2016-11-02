@@ -58,7 +58,7 @@ public class Process {
 			Thread.sleep(10000);
 
 			if (config.getNodeQuorumById(nodeId).size() != 0) {
-				RequestingCandidate rc = new RequestingCandidate(config, nodeId, client, csHandler);
+				RequestingCandidate rc = new RequestingCandidate(config, nodeId, client, csHandler, quroumRequestHandler);
 				rc.requestCS();
 			}
 

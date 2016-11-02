@@ -110,17 +110,13 @@ public class Client implements Runnable {
 	}
 
 	public void broadcastCompletionMsg() {
-		logger.debug("Broadcasting completion message from host:{}", nodeHostname);
 		List<Node> nodeList = config.getNodes();
-		logger.error("NodesList Contentes!!! {}", nodeList.toString());
 		for (Node node : nodeList) {
 			// Ignore sending the completion message to itself
 			if (node.getNodeId().equals(nodeId))
 				continue;
 			Message msg = new Message(nodeId, node.getNodeId(), null, 0, MessageType.COMPLETED);
-			logger.error("Before SENDING BROADCAST! from {}", nodeId);
 			sendMsg(msg);
-			logger.error("After SENDING BROADCAST! from: {} to: {}", nodeId, msg.getDestination());
 		}
 
 	}

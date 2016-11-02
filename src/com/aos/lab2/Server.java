@@ -40,7 +40,7 @@ public class Server implements Runnable {
 		try {
 			listenForConnections();
 		} catch (Exception e) {
-			logger.error(e);
+			//logger.error(e);
 		}
 	}
 

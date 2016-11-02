@@ -66,6 +66,8 @@ public class ServerWorker implements Runnable {
 
 				// clearing buffer
 				buf.clear();
+				ois.close();
+				bis.close();
 
 				if (msg.getMsgType().equals(MessageType.REQUEST)) {
 					quorumRequestHandler.handleRequestMessage(new CSRequest(msg.getSource(), msg.getRequestTS()));
@@ -87,7 +89,7 @@ public class ServerWorker implements Runnable {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Exception in Server Worker thread", e);
+			
 		}
 	}
 
@@ -105,14 +107,13 @@ public class ServerWorker implements Runnable {
 		System.out.println(json);
 	}
 	
-		public void handleCompleteMessage(Integer src) {
+		public void handleCompleteMessage(Integer src) throws InterruptedException {
 			synchronized(ServerWorker.class) {
 			completeMessageCount++;
-			logger.error("Received at:{} and the counter now is:{}", src, completeMessageCount);
-			logger.error("isCompletedisCompletedisCompletedisCompleted:{}", isCompleted);
 			if ((completeMessageCount + 1 == noOfNodes) && isCompleted) {
 				shutdown();
 				logger.error("EXIT!!!!!!!!!!!!!!");
+				Thread.sleep(1000);
 				System.exit(0);
 			}
 			}

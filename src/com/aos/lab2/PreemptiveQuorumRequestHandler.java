@@ -55,7 +55,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 	}
 
 	public synchronized void handleYieldMessage(Integer sourceNodeId) {
-		logger.info("Received yield message from nodeId:{} in quorum nodeId:{}", sourceNodeId, quorumNode.getNodeId());
+		logger.debug("Received yield message from nodeId:{} in quorum nodeId:{}", sourceNodeId, quorumNode.getNodeId());
 
 		if (!grantedRequest.getNodeId().equals(sourceNodeId)) {
 			logger.error(
@@ -77,7 +77,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 	}
 
 	public synchronized void handleReleaseMessage(Integer sourceNode) {
-		logger.info("Received release message from nodeId:{} in quorum nodeId:{}", sourceNode, quorumNode.getNodeId());
+		logger.debug("Received release message from nodeId:{} in quorum nodeId:{}", sourceNode, quorumNode.getNodeId());
 
 		if (!queue.remove(grantedRequest))
 			logger.error(
@@ -105,7 +105,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 
 	private void sendInquireMessage(CSRequest request, CSRequest previousReq) {
 		Message msg = new Message(quorumNode.getNodeId(), previousReq.getNodeId(), MessageType.INQUIRE);
-		logger.info(
+		logger.debug(
 				"Sending inquire message to nodeId:{} from quorum nodeId:{} as request with TS:{} from nodeId:{} has to be serviced",
 				previousReq.getNodeId(), quorumNode.getNodeId(), request.getTimestamp(), request.getNodeId());
 		client.sendMsg(msg);
@@ -113,14 +113,14 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 
 	private void sendGrantMessage(CSRequest request) {
 		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.GRANT);
-		logger.info("Sending grant message to the requesting nodeId:{} from the quorum nodeId:{} .Request TS:{}",
+		logger.debug("Sending grant message to the requesting nodeId:{} from the quorum nodeId:{} .Request TS:{}",
 				request.getNodeId(), quorumNode.getNodeId(), request.getTimestamp());
 		client.sendMsg(msg);
 	}
 
 	private void sendFailedMessage(CSRequest request) {
 		Message msg = new Message(quorumNode.getNodeId(), request.getNodeId(), MessageType.FAILED);
-		logger.info("Sending failed message to the requesting nodeId:{} from quorum nodeId:{}", request.getNodeId(),
+		logger.debug("Sending failed message to the requesting nodeId:{} from quorum nodeId:{}", request.getNodeId(),
 				quorumNode.getNodeId());
 		client.sendMsg(msg);
 	}
@@ -129,14 +129,13 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 	public void setClientHandler(Client client) {
 		this.client = client;
 	}
-	
-	
-	public boolean checkRequestingQueue(){
-		if(this.queue.isEmpty())
+
+	public boolean checkRequestingQueue() {
+		if (this.queue.isEmpty())
 			return true;
 		else
 			return false;
-		
+
 	}
 
 }

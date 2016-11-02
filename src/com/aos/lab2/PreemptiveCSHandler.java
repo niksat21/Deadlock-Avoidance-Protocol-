@@ -81,7 +81,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 		failedSet.add(nodeId);
 
 		if (wasInquired && inquiredBy != null) {
-			sendYieldMessage(nodeId);
+			sendYieldMessage(inquiredBy);
 			wasInquired = false;
 			inquiredBy = null;
 		}
@@ -107,6 +107,7 @@ public class PreemptiveCSHandler implements ICriticalSectionHandler {
 	}
 
 	private void sendYieldMessage(Integer nodeId) {
+		logger.debug("Sending yield message from nodeId:{} to quorum nodeId:{}", sourceNode.getNodeId(), nodeId);
 		client.sendMsg(new Message(sourceNode.getNodeId(), nodeId, MessageType.YIELD));
 		grantSet.remove(nodeId);
 		failedSet.add(nodeId);

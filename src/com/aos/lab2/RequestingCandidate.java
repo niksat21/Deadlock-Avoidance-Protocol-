@@ -12,8 +12,9 @@ public class RequestingCandidate {
 	private Client client;
 	private ICriticalSectionHandler csHandler;
 	private IQuorumRequestHandler quroumRequestHandler;
-	
-	public RequestingCandidate(Config config, Integer nodeId, Client client, ICriticalSectionHandler csHandler, IQuorumRequestHandler quroumRequestHandler) {
+
+	public RequestingCandidate(Config config, Integer nodeId, Client client, ICriticalSectionHandler csHandler,
+			IQuorumRequestHandler quroumRequestHandler) {
 		this.config = config;
 		this.nodeId = nodeId;
 		this.client = client;
@@ -28,7 +29,7 @@ public class RequestingCandidate {
 		Thread.sleep(getExpoRandom(config.getWaitTime()));
 
 		while (count < noOfRequests) {
-			logger.debug("noOfRequests :{} count:{} ", noOfRequests, count);
+			logger.debug("noOfRequests :{} count:{} NodeId:{}", noOfRequests, count, nodeId);
 			long timestamp = System.currentTimeMillis();
 			csHandler.csEnter(timestamp);
 			logger.info("Critical Section: Enter NodeId:{} Request TS:{}", node.getNodeId(), timestamp);
@@ -39,9 +40,9 @@ public class RequestingCandidate {
 			logger.info("Critical Section: Leave NodeId:{}", node.getNodeId());
 			count++;
 		}
-		//checking if all the queues are empty
-		if(quroumRequestHandler.checkRequestingQueue() && csHandler.checkSets() ){
-			//start broadcasting complete message
+		// checking if all the queues are empty
+		if (quroumRequestHandler.checkRequestingQueue() && csHandler.checkSets()) {
+			// start broadcasting complete message
 			ServerWorker.isCompleted = Boolean.TRUE;
 			client.broadcastCompletionMsg();
 		}

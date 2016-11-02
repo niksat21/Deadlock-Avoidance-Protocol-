@@ -28,8 +28,9 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 
 	public synchronized void handleRequestMessage(CSRequest request) {
 		CSRequest previousReq = queue.peek();
-		
-		logger.debug("Received request message from nodeId:{} with TS:{} in quorum nodeId:{}", request.getNodeId(), request.getTimestamp(), quorumNode.getNodeId());
+
+		logger.debug("Received request message from nodeId:{} with TS:{} in quorum nodeId:{}", request.getNodeId(),
+				request.getTimestamp(), quorumNode.getNodeId());
 
 		// Add request to the queue
 		queue.add(request);
@@ -56,7 +57,7 @@ public class PreemptiveQuorumRequestHandler implements IQuorumRequestHandler {
 	public synchronized void handleYieldMessage(Integer sourceNodeId) {
 		logger.info("Received yield message from nodeId:{} in quorum nodeId:{}", sourceNodeId, quorumNode.getNodeId());
 
-		if (grantedRequest.getNodeId() != sourceNodeId) {
+		if (!grantedRequest.getNodeId().equals(sourceNodeId)) {
 			logger.error(
 					"Something is wrong in quorum nodeId:{}. Received an yield message from nodeId:{} but the request was granted to nodeId:{}",
 					quorumNode.getNodeId(), sourceNodeId, grantedRequest.getNodeId());

@@ -89,7 +89,7 @@ public class ServerWorker implements Runnable {
 				}
 			}
 		} catch (Exception e) {
-			
+			//logger.error("Exception in Server Worker thread", e);
 		}
 	}
 
